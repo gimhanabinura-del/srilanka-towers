@@ -30,7 +30,6 @@
             font-weight: bold;
         }
 
-        /* Social Buttons */
         .social-buttons {
             position: fixed;
             bottom: 140px;
@@ -116,7 +115,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- මෙතනට ඔයා ඉල්ලපු අලුත් Mobitel Tower එක ඇතුළත් කළා ---
+        // ස්ථිර දත්ත (මේවා තමයි හැමෝටම පේන්නේ)
         var publicTowers = { 
             "Mobitel": [
                 { name: "Wadduwa Town Tower", lat: 6.665369, lng: 79.929752 },
@@ -129,7 +128,9 @@
         };
 
         var localData = JSON.parse(localStorage.getItem('myTowers')) || { "Hutch": [], "Mobitel": [], "Dialog": [] };
-        var myMap = L.map('map', { zoomControl: false }).setView([6.67, 79.92], 12);
+        
+        // ආරම්භක දසුන වාද්දුවට සෙට් කළා
+        var myMap = L.map('map', { zoomControl: false }).setView([6.67, 79.92], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
@@ -137,12 +138,15 @@
             var net = document.getElementById('networkSelect').value;
             markerGroup.clearLayers();
             if (!net) return;
+            
             var allForNet = publicTowers[net].concat(localData[net]);
             var bounds = [];
+            
             allForNet.forEach(function(tower) {
                 L.marker([tower.lat, tower.lng]).bindPopup("<b>" + net + " Tower</b><br>" + tower.name).addTo(markerGroup);
                 bounds.push([tower.lat, tower.lng]);
             });
+            
             if(bounds.length > 0) myMap.fitBounds(bounds, { padding: [50, 50] });
         }
 
@@ -157,7 +161,7 @@
             if (name && !isNaN(lat) && !isNaN(lng)) {
                 localData[net].push({ name: name, lat: lat, lng: lng });
                 localStorage.setItem('myTowers', JSON.stringify(localData));
-                alert("සේව් කළා! (හැමෝටම පේන්න නම් මට විස්තර එවන්න)");
+                alert("ඔබේ ෆෝන් එකට සේව් කළා. අනිත් අයට පේන්න මට දත්ත එවන්න.");
                 updateDisplay();
                 closeAdmin();
             }
