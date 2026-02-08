@@ -116,18 +116,20 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- මෙන්න මේ ටික තමයි වැදගත්! ---
-        // මේ publicTowers ඇතුළට දාන දේවල් ලෝකේ ඕනෑම කෙනෙක්ට පේනවා.
+        // --- මෙතනට ඔයා ඉල්ලපු අලුත් Mobitel Tower එක ඇතුළත් කළා ---
         var publicTowers = { 
             "Mobitel": [
-                { name: "Wadduwa Town Mobitel Tower", lat: 6.665369, lng: 79.929752 }
+                { name: "Wadduwa Town Tower", lat: 6.665369, lng: 79.929752 },
+                { name: "Wadduwa Molligoda Mobitel Tower", lat: 6.684395, lng: 79.919696 }
             ], 
             "Dialog": [], 
-            "Hutch": [] 
+            "Hutch": [
+                { name: "Wadduwa Hutch Tower", lat: 6.68486, lng: 79.919579 }
+            ] 
         };
 
         var localData = JSON.parse(localStorage.getItem('myTowers')) || { "Hutch": [], "Mobitel": [], "Dialog": [] };
-        var myMap = L.map('map', { zoomControl: false }).setView([7.8731, 80.7718], 7);
+        var myMap = L.map('map', { zoomControl: false }).setView([6.67, 79.92], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
@@ -135,16 +137,12 @@
             var net = document.getElementById('networkSelect').value;
             markerGroup.clearLayers();
             if (!net) return;
-            
-            // හැමෝටම පේන ඒවා සහ ඔයාගේ ෆෝන් එකේ විතරක් තියෙන ඒවා දෙකම එකතු කරනවා
             var allForNet = publicTowers[net].concat(localData[net]);
             var bounds = [];
-            
             allForNet.forEach(function(tower) {
                 L.marker([tower.lat, tower.lng]).bindPopup("<b>" + net + " Tower</b><br>" + tower.name).addTo(markerGroup);
                 bounds.push([tower.lat, tower.lng]);
             });
-            
             if(bounds.length > 0) myMap.fitBounds(bounds, { padding: [50, 50] });
         }
 
@@ -159,7 +157,7 @@
             if (name && !isNaN(lat) && !isNaN(lng)) {
                 localData[net].push({ name: name, lat: lat, lng: lng });
                 localStorage.setItem('myTowers', JSON.stringify(localData));
-                alert("ඔබේ ෆෝන් එකට සේව් කළා. හැමෝටම පේන්න නම් මට මේ විස්තර එවන්න, මම කෝඩ් එක අප්ඩේට් කරලා දෙන්නම්.");
+                alert("සේව් කළා! (හැමෝටම පේන්න නම් මට විස්තර එවන්න)");
                 updateDisplay();
                 closeAdmin();
             }
