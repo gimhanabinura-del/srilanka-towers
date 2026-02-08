@@ -3,25 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Router Home - Confirm Send</title>
+    <title>Router Home - Shared Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
         .header { background: #1a73e8; color: white; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; }
         #map { height: 40vh; width: 100%; border-bottom: 4px solid #1a73e8; }
-        
         .comment-area { padding: 20px; background: white; margin: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .select-box, .input-field, #commentInput { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; box-sizing: border-box; margin-bottom: 12px; }
-        
-        #towerDisplay, #inputSection { display: none; }
-        .tower-tag { background: #e3f2fd; color: #0d47a1; padding: 12px; border-radius: 8px; font-weight: bold; margin-bottom: 12px; border: 1px solid #90caf9; text-align: center; }
-        
-        .flex-row { display: flex; gap: 10px; }
-        #commentInput { height: 70px; resize: none; }
-        .post-btn { padding: 14px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; }
-        .post-btn:active { background: #1da851; transform: scale(0.98); }
-        
+        .select-box, .input-field { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; box-sizing: border-box; margin-bottom: 12px; }
+        .tower-tag { background: #e3f2fd; color: #0d47a1; padding: 12px; border-radius: 8px; font-weight: bold; margin-bottom: 12px; text-align: center; border: 1px solid #90caf9; }
+        .post-btn { padding: 14px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; }
+        .sync-info { font-size: 12px; color: #666; text-align: center; margin-top: 5px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -32,95 +25,77 @@
         <div style="border: 4px solid #f3f3f3; border-top: 4px solid #1a73e8; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite;"></div>
     </div>
 
-    <div class="header">Router Home - Confirmation</div>
+    <div class="header">Shared Network Map</div>
     <div id="map"></div>
 
     <div class="comment-area">
-        <h3 style="margin-top:0; font-size: 18px; color: #333;">Tower Data Update</h3>
+        <h3 style="margin-top:0; font-size: 18px;">Select Network</h3>
         
-        <select id="networkSelect" class="select-box" onchange="checkNetwork()">
+        <select id="networkSelect" class="select-box" onchange="showNetworkTower()">
             <option value="">Network එක තෝරන්න...</option>
             <option value="Dialog">Dialog</option>
             <option value="Hutch">Hutch</option>
             <option value="Mobitel">Mobitel</option>
         </select>
 
-        <div id="towerDisplay">
+        <div id="towerDisplay" style="display:none;">
             <div id="towerName" class="tower-tag"></div>
-            <div class="flex-row">
-                <input type="number" id="pciInput" class="input-field" placeholder="PCI අගය">
-                <input type="number" id="earfcnInput" class="input-field" placeholder="EARFCN">
+            
+            <div id="inputSection">
+                <div style="display:flex; gap:10px;">
+                    <input type="number" id="pciInput" class="input-field" placeholder="PCI">
+                    <input type="number" id="earfcnInput" class="input-field" placeholder="EARFCN">
+                </div>
+                <button class="post-btn" onclick="confirmAndSend()">WhatsApp මගින් යවන්න ✅</button>
             </div>
         </div>
-
-        <div id="inputSection">
-            <textarea id="commentInput" placeholder="වෙනත් විස්තර..."></textarea>
-            <button class="post-btn" onclick="confirmAndSend()">WhatsApp මගින් යවන්න ✅</button>
-        </div>
+        <p class="sync-info">දත්ත සියලුම පරිශීලකයින් අතර Share වේ.</p>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        var networkTowers = {
+        // --- මෙතන තමයි දැනට තියෙන Towers ටික තියෙන්නේ ---
+        // පස්සේ ඔයාට ඕන නම් මේක Google Sheet එකකට සම්බන්ධ කරලා Live Update වෙන්න හදන්න පුළුවන්.
+        var sharedTowers = {
+            "Hutch": "Panadura Town Tower",
             "Mobitel": "Wadduwa Tower",
-            "Hutch": "Panadura Town Tower"
+            "Dialog": "" // Dialog වලට දැනට Tower එකක් නැත
         };
 
-        function checkNetwork() {
+        function showNetworkTower() {
             var net = document.getElementById('networkSelect').value;
-            var towerDiv = document.getElementById('towerDisplay');
-            var inputDiv = document.getElementById('inputSection');
+            var display = document.getElementById('towerDisplay');
+            var nameTag = document.getElementById('towerName');
+            var inputSection = document.getElementById('inputSection');
 
-            if (net !== "" && networkTowers[net]) {
-                document.getElementById('towerName').innerHTML = "📍 " + networkTowers[net];
-                towerDiv.style.display = 'block';
-                inputDiv.style.display = 'block';
+            if (net !== "" && sharedTowers[net] !== "") {
+                nameTag.innerHTML = "📍 " + sharedTowers[net];
+                display.style.display = 'block';
+                inputSection.style.display = 'block';
             } else {
-                towerDiv.style.display = 'none';
-                inputDiv.style.display = (net === "Dialog") ? 'none' : 'none';
+                display.style.display = 'none';
             }
         }
 
         window.onload = function() {
-            setTimeout(function() { document.getElementById('splash').style.display = 'none'; }, 1500); 
+            setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 1000);
         };
 
         var myMap = L.map('map', { zoomControl: false }).setView([6.6621, 79.9348], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
 
-        // --- මෙන්න අලුත් Confirmation Function එක ---
         function confirmAndSend() {
-            var pci = document.getElementById('pciInput').value;
-            var earfcn = document.getElementById('earfcnInput').value;
-
-            if(!pci || !earfcn) {
-                alert("කරුණාකර PCI සහ EARFCN ඇතුළත් කරන්න!");
-                return;
-            }
-
-            // Confirm Box එක පෙන්වීම
-            var userChoice = confirm("ඔබට මෙම පණිවිඩය WhatsApp මගින් යැවීමට අවශ්‍යද?");
-            
-            if (userChoice == true) {
-                sendWhatsApp(); // මැසේජ් එක යවන function එකට යන්න
-            } else {
-                // කිසිවක් නොකරන්න
-            }
-        }
-
-        function sendWhatsApp() {
             var net = document.getElementById('networkSelect').value;
+            var tower = sharedTowers[net];
             var pci = document.getElementById('pciInput').value;
             var earfcn = document.getElementById('earfcnInput').value;
-            var text = document.getElementById('commentInput').value;
-            var myNumber = "947XXXXXXXX"; 
 
-            var towerText = networkTowers[net] ? `\n📍 *Tower:* ${networkTowers[net]}` : "";
-            var cellData = `\n🔢 *PCI:* ${pci}\n📡 *EARFCN:* ${earfcn}`;
-            var infoText = text.trim() !== "" ? `\n📝 *Info:* ${text}` : "";
+            if(!pci || !earfcn) { alert("PCI සහ EARFCN ඇතුළත් කරන්න!"); return; }
 
-            var fullMsg = `*Router Home Update*\n\n📶 *Network:* ${net}${towerText}${cellData}${infoText}`;
-            window.open("https://wa.me/" + myNumber + "?text=" + encodeURIComponent(fullMsg), '_blank');
+            if(confirm("මෙම දත්ත යැවීමට අවශ්‍යද?")) {
+                var msg = `*Router Update*\nNetwork: ${net}\nTower: ${tower}\nPCI: ${pci}\nEARFCN: ${earfcn}`;
+                window.open("https://wa.me/947XXXXXXXX?text=" + encodeURIComponent(msg));
+            }
         }
     </script>
 </body>
