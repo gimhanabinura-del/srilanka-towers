@@ -3,70 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Network Tower Map SL</title>
+    <title>Network Tower Map Pro</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
         #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
-        .top-container { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 400px; }
-        .select-box { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #1a73e8; font-size: 16px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-weight: bold; }
-        .loc-button { position: fixed; bottom: 25px; right: 20px; z-index: 1500; background: white; color: #1a73e8; border: 2px solid #1a73e8; width: 50px; height: 50px; border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        .top-container {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .select-box {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #1a73e8;
+            font-size: 16px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        /* Admin Panel */
+        #adminPanel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 85%;
+            max-width: 320px;
+        }
+
+        .admin-input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn-save { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+        /* Social Buttons */
+        .social-buttons {
+            position: fixed;
+            bottom: 140px;
+            right: 20px;
+            z-index: 1500;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .whatsapp { background-color: #25D366; }
+        .facebook { background-color: #1877F2; }
+
+        /* Action Buttons */
+        .loc-button { position: fixed; bottom: 85px; right: 20px; z-index: 1500; background: white; color: #1a73e8; border: 2px solid #1a73e8; width: 45px; height: 45px; border-radius: 50%; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .secret-admin { position: fixed; bottom: 30px; right: 20px; z-index: 1500; background: #1a73e8; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 28px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
 
     <div class="top-container">
-        <select id="networkSelect" class="select-box" onchange="updateTowers()">
+        <select id="networkSelect" class="select-box" onchange="updateDisplay()">
             <option value="">ජාලය තෝරන්න (Select Network)</option>
+            <option value="Hutch">Hutch</option>
             <option value="Mobitel">Mobitel</option>
             <option value="Dialog">Dialog</option>
-            <option value="Hutch">Hutch</option>
         </select>
     </div>
 
+    <div class="social-buttons">
+        <a href="https://wa.me/94765825288" target="_blank" class="social-btn whatsapp">WA</a>
+        <a href="https://www.facebook.com/share/1CMKzHNNiM/" target="_blank" class="social-btn facebook">FB</a>
+    </div>
+
+    <div id="adminPanel">
+        <h3 style="margin:0; color:#1a73e8; text-align:center;">Tower එකතු කරන්න</h3>
+        <select id="adminNetSelect" class="admin-input">
+            <option value="Hutch">Hutch</option>
+            <option value="Mobitel">Mobitel</option>
+            <option value="Dialog">Dialog</option>
+        </select>
+        <input type="text" id="towerName" class="admin-input" placeholder="Tower නම">
+        <input type="number" id="towerLat" class="admin-input" step="any" placeholder="Latitude">
+        <input type="number" id="towerLng" class="admin-input" step="any" placeholder="Longitude">
+        <button class="btn-save" onclick="saveTower()">සේව් කරන්න</button>
+        <button onclick="closeAdmin()" style="width:100%; border:none; background:none; margin-top:10px; color:#666; cursor:pointer;">වහන්න</button>
+    </div>
+
     <div id="map"></div>
-    <button class="loc-button" onclick="findMe()">📍</button>
+
+    <button class="loc-button" onclick="findMyLocation()">📍</button>
+    <button class="secret-admin" onclick="openAdmin()">•</button>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- මෙතනට ඔයාගේ Towers වල විස්තර එකතු කරන්න ---
-        // මේ දත්ත ලෝකේ ඕනෑම කෙනෙක්ට පේනවා
-        const towerList = [
-            { net: "Mobitel", name: "Panadura Tower", lat: 6.7106, lng: 79.9074 },
-            { net: "Mobitel", name: "Moratuwa Station Tower", lat: 6.7720, lng: 79.8820 },
-            { net: "Dialog", name: "Kandy Center", lat: 7.2906, lng: 80.6337 },
-            { net: "Hutch", name: "Galle Fort", lat: 6.0331, lng: 80.2147 }
-            // තව ටවර් ඕනේ නම් මේ වගේම පල්ලෙහාට දාන්න
-        ];
+        // දත්ත (මෙතන දැනට හිස්ව ඇත්තේ, ඔයා ඇතුලත් කරන ඒවා localStorage එකේ සේව් වේ)
+        var publicTowers = { "Mobitel": [], "Dialog": [], "Hutch": [] };
+        var localData = JSON.parse(localStorage.getItem('myTowers')) || { "Hutch": [], "Mobitel": [], "Dialog": [] };
 
         var myMap = L.map('map', { zoomControl: false }).setView([7.8731, 80.7718], 7);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(myMap);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
+        var markerGroup = L.layerGroup().addTo(myMap);
 
-        var markers = L.layerGroup().addTo(myMap);
+        function updateDisplay() {
+            var net = document.getElementById('networkSelect').value;
+            markerGroup.clearLayers();
+            if (!net) return;
+            var allForNet = publicTowers[net].concat(localData[net]);
+            var bounds = [];
+            allForNet.forEach(function(tower) {
+                L.marker([tower.lat, tower.lng]).bindPopup("<b>" + net + " Tower</b><br>" + tower.name).addTo(markerGroup);
+                bounds.push([tower.lat, tower.lng]);
+            });
+            if(bounds.length > 0) myMap.fitBounds(bounds, { padding: [50, 50] });
+        }
 
-        function updateTowers() {
-            var selected = document.getElementById('networkSelect').value;
-            markers.clearLayers();
+        function openAdmin() {
+            if (prompt("Password:") === "20101027") document.getElementById('adminPanel').style.display = 'block';
+        }
 
-            var filtered = towerList.filter(t => t.net === selected);
+        function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
 
-            if (filtered.length > 0) {
-                var bounds = [];
-                filtered.forEach(t => {
-                    var m = L.marker([t.lat, t.lng]).bindPopup(`<b>${t.net} Tower</b><br>${t.name}`);
-                    markers.addLayer(m);
-                    bounds.push([t.lat, t.lng]);
-                });
-                myMap.fitBounds(bounds, { padding: [50, 50] });
+        function saveTower() {
+            var net = document.getElementById('adminNetSelect').value;
+            var name = document.getElementById('towerName').value;
+            var lat = parseFloat(document.getElementById('towerLat').value);
+            var lng = parseFloat(document.getElementById('towerLng').value);
+            if (name && !isNaN(lat) && !isNaN(lng)) {
+                localData[net].push({ name: name, lat: lat, lng: lng });
+                localStorage.setItem('myTowers', JSON.stringify(localData));
+                alert("සාර්ථකව සේව් කළා!");
+                updateDisplay();
+                closeAdmin();
             }
         }
 
-        function findMe() {
-            myMap.locate({setView: true, maxZoom: 15});
+        function findMyLocation() {
+            myMap.locate({setView: true, maxZoom: 14});
             myMap.on('locationfound', function(e) {
-                L.circleMarker(e.latlng, {radius: 10, color: '#1a73e8'}).addTo(myMap).bindPopup("ඔබ සිටින ස්ථානය").openPopup();
+                L.circleMarker(e.latlng, {radius: 8, color: '#1a73e8'}).addTo(myMap).bindPopup("ඔබ මෙතැනයි").openPopup();
             });
         }
     </script>
