@@ -6,107 +6,160 @@
     <title>Network Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
-        .header { background: #333; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; }
-        #map { height: 45vh; width: 100%; border-bottom: 2px solid #ddd; }
-        
-        .container { padding: 20px; background: white; margin: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .select-box, .input-field { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; box-sizing: border-box; margin-bottom: 12px; }
-        
-        .tower-info { display: none; margin-top: 10px; }
-        .tower-tag { background: #e8f5e9; color: #2e7d32; padding: 12px; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 15px; border: 1px solid #c8e6c9; }
-        
-        .post-btn { padding: 14px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; }
-        .update-link { display: block; text-align: center; color: #1a73e8; font-size: 13px; margin-top: 15px; text-decoration: none; cursor: pointer; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        #map { height: 100vh; width: 100%; position: relative; z-index: 1; }
+
+        .overlay-container {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .select-box {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #1a73e8;
+            font-size: 16px;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+
+        .tower-display {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a73e8;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            border: 1px solid #ddd;
+        }
+
+        #adminPanel {
+            display: none;
+            margin-top: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .admin-btn {
+            background: transparent;
+            color: #ccc;
+            border: none;
+            font-size: 10px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+            padding: 5px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">Network Map</div>
-    <div id="map"></div>
-
-    <div class="container">
-        <label style="font-size: 14px; color: #666;">ජාලය තෝරන්න:</label>
-        <select id="networkSelect" class="select-box" onchange="checkNetwork()">
-            <option value="">Network එක තෝරන්න...</option>
+    <div class="overlay-container">
+        <select id="networkSelect" class="select-box" onchange="updateDisplay()">
+            <option value="">ජාලය තෝරන්න (Select Network)</option>
             <option value="Hutch">Hutch</option>
             <option value="Mobitel">Mobitel</option>
             <option value="Dialog">Dialog</option>
         </select>
 
-        <div id="towerInfo" class="tower-info">
-            <div id="towerName" class="tower-tag"></div>
-            
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="pciInput" class="input-field" placeholder="PCI">
-                <input type="number" id="earfcnInput" class="input-field" placeholder="EARFCN">
-            </div>
-            <button class="post-btn" onclick="sendData()">WhatsApp මගින් යවන්න ✅</button>
-        </div>
+        <div id="towerNameBox" class="tower-display"></div>
 
-        <div id="addTowerSection" style="display:none; margin-top:20px; border-top: 1px solid #eee; padding-top: 15px;">
-            <input type="text" id="newTowerName" class="input-field" placeholder="අලුත් Tower නමක් මෙතන ලියන්න...">
-            <button class="post-btn" style="background: #1a73e8;" onclick="addNewTower()">Tower එක Update කරන්න</button>
+        <div id="adminPanel">
+            <p id="adminHeader" style="margin:0 0 10px 0; font-size:12px; color:#666;"></p>
+            <input type="text" id="newTowerInput" placeholder="නව Tower නම..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box; margin-bottom:10px;">
+            <button onclick="saveTower()" style="width:100%; padding:10px; background:#1a73e8; color:white; border:none; border-radius:4px; font-weight:bold;">Update Tower</button>
         </div>
         
-        <span class="update-link" onclick="toggleAddSection()">+ අලුත් Tower එකක් ඇඩ් කරන්න</span>
+        <button class="admin-btn" onclick="checkAdmin()">Admin Login</button>
     </div>
+
+    <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // මූලික Tower දත්ත (ඔයාට ඕන විදිහට)
+        // ආරම්භක දත්ත (Default Towers)
         var towerData = {
-            "Hutch": "Panadura Town Tower",
-            "Mobitel": "Wadduwa Tower",
-            "Dialog": "" // Dialog වලට දැනට නැත
+            "Hutch": "📍 Panadura Town Tower",
+            "Mobitel": "📍 Wadduwa Tower",
+            "Dialog": "📍 Dialog Tower"
         };
 
-        function checkNetwork() {
-            var net = document.getElementById('networkSelect').value;
-            var infoDiv = document.getElementById('towerInfo');
-            var nameTag = document.getElementById('towerName');
+        // Browser එකේ කලින් Save කළ දත්ත තිබේ නම් ඒවා ලබා ගනී
+        if(localStorage.getItem('networkTowers')) {
+            towerData = JSON.parse(localStorage.getItem('networkTowers'));
+        }
 
-            if (net !== "" && towerData[net] !== "") {
-                nameTag.innerHTML = "📍 " + towerData[net];
-                infoDiv.style.display = 'block';
+        // සිතියම සකස් කිරීම
+        var myMap = L.map('map', { zoomControl: false }).setView([6.6621, 79.9348], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
+
+        function updateDisplay() {
+            var net = document.getElementById('networkSelect').value;
+            var nameBox = document.getElementById('towerNameBox');
+            
+            // Admin panel එක වසා දමයි (Network එක මාරු කරන විට)
+            document.getElementById('adminPanel').style.display = 'none';
+
+            if (net !== "" && towerData[net]) {
+                nameBox.innerHTML = towerData[net];
+                nameBox.style.display = 'block';
             } else {
-                infoDiv.style.display = 'none';
+                nameBox.style.display = 'none';
             }
         }
 
-        function toggleAddSection() {
-            var sec = document.getElementById('addTowerSection');
-            sec.style.display = (sec.style.display === 'none') ? 'block' : 'none';
-        }
-
-        function addNewTower() {
+        // Admin Login - Password: 20101027
+        function checkAdmin() {
             var net = document.getElementById('networkSelect').value;
-            var newName = document.getElementById('newTowerName').value;
+            if (net === "") {
+                alert("කරුණාකර පළමුව Network එකක් තෝරන්න!");
+                return;
+            }
 
-            if (net === "") { alert("පළමුව Network එකක් තෝරන්න!"); return; }
-            if (newName === "") { alert("Tower නමක් ඇතුළත් කරන්න!"); return; }
-
-            towerData[net] = newName; // Tower එක තාවකාලිකව Update වේ
-            alert(net + " සඳහා Tower එක ඇතුළත් කළා! ✅");
-            document.getElementById('newTowerName').value = "";
-            checkNetwork();
+            var pw = prompt("Password එක ඇතුළත් කරන්න:");
+            if (pw === "20101027") { 
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('adminHeader').innerHTML = net + " සඳහා අලුත් Tower නමක් දෙන්න:";
+            } else {
+                alert("වැරදි Password එකක්!");
+            }
         }
 
-        // Map එක Load කිරීම
-        var myMap = L.map('map', { zoomControl: false }).setView([6.6621, 79.9348], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
-
-        function sendData() {
+        // අදාළ Network එකට විතරක් දත්ත Save කිරීම
+        function saveTower() {
             var net = document.getElementById('networkSelect').value;
-            var tower = towerData[net];
-            var pci = document.getElementById('pciInput').value;
-            var earfcn = document.getElementById('earfcnInput').value;
+            var newName = document.getElementById('newTowerInput').value;
+            
+            if (newName.trim() === "") {
+                alert("කරුණාකර නමක් ඇතුළත් කරන්න!");
+                return;
+            }
 
-            if(!pci || !earfcn) { alert("කරුණාකර PCI සහ EARFCN ඇතුළත් කරන්න!"); return; }
-
-            var msg = `*Network Update*\n\n📶 Network: ${net}\n📍 Tower: ${tower}\n🔢 PCI: ${pci}\n📡 EARFCN: ${earfcn}`;
-            window.open("https://wa.me/947XXXXXXXX?text=" + encodeURIComponent(msg));
+            // අදාළ Network එකේ අගය පමණක් වෙනස් කරයි
+            towerData[net] = "📍 " + newName;
+            
+            // මුළු object එකම LocalStorage එකට Save කරයි
+            localStorage.setItem('networkTowers', JSON.stringify(towerData));
+            
+            alert(net + " Tower එක සාර්ථකව Update වුණා! ✅");
+            updateDisplay(); // Screen එක Update කරයි
+            document.getElementById('newTowerInput').value = ""; // Input එක හිස් කරයි
         }
+
+        setTimeout(function(){ myMap.invalidateSize(); }, 500);
     </script>
 </body>
 </html>
