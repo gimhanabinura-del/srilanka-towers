@@ -30,22 +30,8 @@
             margin-bottom: 10px;
         }
 
-        .tower-display {
-            display: none;
-            background: rgba(255, 255, 255, 0.95);
-            color: #1a73e8;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 1px solid #ddd;
-        }
-
         #adminPanel {
             display: none;
-            margin-top: 10px;
             background: white;
             padding: 15px;
             border-radius: 10px;
@@ -53,14 +39,13 @@
             text-align: center;
         }
 
-        /* රහස් Admin Button එක (තිතක් වගේ පේන්නේ) */
         .secret-admin {
             position: fixed;
             bottom: 5px;
             right: 5px;
             z-index: 2000;
             background: transparent;
-            color: rgba(0,0,0,0.05); /* ඉතාම අඩුවෙන් පේන්නේ */
+            color: rgba(0,0,0,0.05);
             border: none;
             font-size: 10px;
             cursor: pointer;
@@ -77,11 +62,11 @@
             <option value="Dialog">Dialog</option>
         </select>
 
-        <div id="towerNameBox" class="tower-display"></div>
-
         <div id="adminPanel">
-            <input type="text" id="newTowerInput" placeholder="නව Tower නම..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing:border-box; margin-bottom:10px;">
-            <button onclick="saveTower()" style="width:100%; padding:10px; background:#1a73e8; color:white; border:none; border-radius:5px; font-weight:bold;">Update</button>
+            <input type="text" id="towerName" placeholder="Tower නම" style="width:100%; margin-bottom:5px; padding:8px;">
+            <input type="text" id="towerLat" placeholder="Latitude (අක්ෂාංශ)" style="width:100%; margin-bottom:5px; padding:8px;">
+            <input type="text" id="towerLng" placeholder="Longitude (දේශාංශ)" style="width:100%; margin-bottom:10px; padding:8px;">
+            <button onclick="saveTower()" style="width:100%; padding:10px; background:#1a73e8; color:white; border:none; border-radius:5px; font-weight:bold;">Tower එක එක් කරන්න</button>
         </div>
     </div>
 
@@ -91,62 +76,78 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // මුලින් කිසිම නමක් පෙන්වන්නේ නැත (හිස්ව පවතී)
-        var towerData = {
-            "Hutch": "",
-            "Mobitel": "",
-            "Dialog": ""
+        // දත්ත ගබඩාව (Network අනුව කුළුණු ලැයිස්තු)
+        var networkData = {
+            "Hutch": [],
+            "Mobitel": [],
+            "Dialog": []
         };
 
-        if(localStorage.getItem('networkTowers')) {
-            towerData = JSON.parse(localStorage.getItem('networkTowers'));
+        // කලින් සේව් කළ දත්ත ඇත්නම් ලබා ගැනීම
+        if(localStorage.getItem('myNetworkTowers')) {
+            networkData = JSON.parse(localStorage.getItem('myNetworkTowers'));
         }
 
         var myMap;
+        var markerGroup = L.layerGroup();
+
         function initMap() {
-            myMap = L.map('map', { zoomControl: false }).setView([6.6621, 79.9348], 14);
+            myMap = L.map('map', { zoomControl: false }).setView([7.8731, 80.7718], 8); // ශ්‍රී ලංකාව මැදට
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
-            setTimeout(function(){ myMap.invalidateSize(); }, 500);
+            markerGroup.addTo(myMap);
         }
 
         window.onload = initMap;
 
         function updateDisplay() {
             var net = document.getElementById('networkSelect').value;
-            var nameBox = document.getElementById('towerNameBox');
+            markerGroup.clearLayers(); // පරණ Marker අයින් කරන්න
             document.getElementById('adminPanel').style.display = 'none';
 
-            if (net !== "" && towerData[net] && towerData[net] !== "") {
-                nameBox.innerHTML = towerData[net];
-                nameBox.style.display = 'block';
-            } else {
-                nameBox.style.display = 'none';
+            if (net !== "" && networkData[net].length > 0) {
+                var bounds = [];
+                networkData[net].forEach(function(tower) {
+                    var m = L.marker([tower.lat, tower.lng]).bindPopup("<b>" + tower.name + "</b>");
+                    markerGroup.addLayer(m);
+                    bounds.push([tower.lat, tower.lng]);
+                });
+                myMap.fitBounds(bounds, { padding: [50, 50] });
             }
         }
 
         function checkAdmin() {
-            var net = document.getElementById('networkSelect').value;
-            if (net === "") { alert("පළමුව Network එකක් තෝරන්න!"); return; }
-
+            if (document.getElementById('networkSelect').value === "") { 
+                alert("පළමුව Network එකක් තෝරන්න!"); 
+                return; 
+            }
             var pw = prompt("Password එක ඇතුළත් කරන්න:");
             if (pw === "20101027") { 
                 document.getElementById('adminPanel').style.display = 'block';
-            } else {
-                alert("වැරදි Password එකක්!");
             }
         }
 
         function saveTower() {
             var net = document.getElementById('networkSelect').value;
-            var newName = document.getElementById('newTowerInput').value;
-            if (newName.trim() === "") { alert("නමක් ඇතුළත් කරන්න!"); return; }
+            var name = document.getElementById('towerName').value;
+            var lat = parseFloat(document.getElementById('towerLat').value);
+            var lng = parseFloat(document.getElementById('towerLng').value);
 
-            towerData[net] = "📍 " + newName;
-            localStorage.setItem('networkTowers', JSON.stringify(towerData));
+            if (!name || isNaN(lat) || isNaN(lng)) {
+                alert("කරුණාකර සියලු විස්තර නිවැරදිව ඇතුළත් කරන්න!");
+                return;
+            }
+
+            // ලැයිස්තුවට අලුත් කුළුණ එක් කිරීම
+            networkData[net].push({ name: name, lat: lat, lng: lng });
+            localStorage.setItem('myNetworkTowers', JSON.stringify(networkData));
             
-            alert(net + " සාර්ථකව Update වුණා!");
+            alert("සාර්ථකව එක් කළා!");
             updateDisplay();
-            document.getElementById('newTowerInput').value = "";
+            
+            // Input Fields හිස් කිරීම
+            document.getElementById('towerName').value = "";
+            document.getElementById('towerLat').value = "";
+            document.getElementById('towerLng').value = "";
         }
     </script>
 </body>
