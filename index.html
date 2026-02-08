@@ -30,25 +30,6 @@
             font-weight: bold;
         }
 
-        /* Admin Panel */
-        #adminPanel {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2000;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: 85%;
-            max-width: 320px;
-        }
-
-        .admin-input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .btn-save { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
-
         /* Social Buttons */
         .social-buttons {
             position: fixed;
@@ -77,9 +58,25 @@
         .whatsapp { background-color: #25D366; }
         .facebook { background-color: #1877F2; }
 
-        /* Action Buttons */
         .loc-button { position: fixed; bottom: 85px; right: 20px; z-index: 1500; background: white; color: #1a73e8; border: 2px solid #1a73e8; width: 45px; height: 45px; border-radius: 50%; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .secret-admin { position: fixed; bottom: 30px; right: 20px; z-index: 1500; background: #1a73e8; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 28px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        #adminPanel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 85%;
+            max-width: 320px;
+        }
+        .admin-input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn-save { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -119,10 +116,16 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // දත්ත (මෙතන දැනට හිස්ව ඇත්තේ, ඔයා ඇතුලත් කරන ඒවා localStorage එකේ සේව් වේ)
-        var publicTowers = { "Mobitel": [], "Dialog": [], "Hutch": [] };
-        var localData = JSON.parse(localStorage.getItem('myTowers')) || { "Hutch": [], "Mobitel": [], "Dialog": [] };
+        // --- මෙතනට ඔයා දුන්න නිවැරදි Wadduwa Tower එක දැම්මා (දැන් හැමෝටම පේනවා) ---
+        var publicTowers = { 
+            "Mobitel": [
+                { name: "Wadduwa Town Tower", lat: 6.665369, lng: 79.929752 }
+            ], 
+            "Dialog": [], 
+            "Hutch": [] 
+        };
 
+        var localData = JSON.parse(localStorage.getItem('myTowers')) || { "Hutch": [], "Mobitel": [], "Dialog": [] };
         var myMap = L.map('map', { zoomControl: false }).setView([7.8731, 80.7718], 7);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
@@ -140,10 +143,7 @@
             if(bounds.length > 0) myMap.fitBounds(bounds, { padding: [50, 50] });
         }
 
-        function openAdmin() {
-            if (prompt("Password:") === "20101027") document.getElementById('adminPanel').style.display = 'block';
-        }
-
+        function openAdmin() { if (prompt("Password:") === "20101027") document.getElementById('adminPanel').style.display = 'block'; }
         function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
 
         function saveTower() {
@@ -154,7 +154,7 @@
             if (name && !isNaN(lat) && !isNaN(lng)) {
                 localData[net].push({ name: name, lat: lat, lng: lng });
                 localStorage.setItem('myTowers', JSON.stringify(localData));
-                alert("සාර්ථකව සේව් කළා!");
+                alert("සාර්ථකයි! අනිත් අයට පෙනීමට නම් මේ දත්ත මට එවන්න.");
                 updateDisplay();
                 closeAdmin();
             }
