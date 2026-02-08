@@ -7,8 +7,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
-
-        /* Splash Screen */
         #splash {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #ffffff; display: flex; flex-direction: column;
@@ -16,16 +14,12 @@
             transition: opacity 0.8s ease;
         }
         .biz-name { font-size: 28px; font-weight: bold; color: #1a73e8; margin: 10px 0; }
-
-        /* Header */
         .header {
             background: #1a73e8; color: white; padding: 15px;
             text-align: center; font-size: 22px; font-weight: bold;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-
         #map { height: 45vh; width: 100%; border-bottom: 4px solid #1a73e8; }
-        
         .loc-btn {
             position: absolute; top: 90px; right: 10px; z-index: 1000;
             background: white; border: 2px solid #1a73e8; padding: 10px;
@@ -33,32 +27,20 @@
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2); font-size: 22px;
         }
-
-        /* Comment Section */
         .comment-area { 
             padding: 20px; background: white; margin: 15px; 
             border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
         }
-        .comment-area h3 { margin-top: 0; color: #333; font-size: 18px; border-left: 4px solid #1a73e8; padding-left: 10px; }
-        
         .select-box, #commentInput { 
             width: 100%; padding: 12px; border: 1px solid #ccc; 
             border-radius: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 10px;
         }
         #commentInput { height: 70px; resize: none; }
-
         .post-btn { 
             padding: 12px; background: #25D366; 
             color: white; border: none; border-radius: 5px; cursor: pointer; 
             font-weight: bold; width: 100%; font-size: 16px;
         }
-        
-        #commentList { list-style: none; padding: 0; margin-top: 15px; }
-        .comment-item { 
-            background: #f8f9fa; padding: 12px; border-radius: 8px; 
-            margin-bottom: 8px; border-left: 4px solid #1a73e8; font-size: 14px;
-        }
-
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -77,7 +59,7 @@
     <div class="comment-area">
         <h3>Network Update</h3>
         
-        <select id="networkSelect" class="select-box">
+        <select id="networkSelect" class="select-box" onchange="updateTowerList()">
             <option value="">Network එක තෝරන්න...</option>
             <option value="Dialog">Dialog</option>
             <option value="Hutch">Hutch</option>
@@ -85,21 +67,39 @@
         </select>
 
         <select id="towerSelect" class="select-box">
-            <option value="">Tower එක තෝරන්න...</option>
-            <option value="Wadduwa Tower">Wadduwa Tower</option>
-            <option value="Panadura Tower">Panadura Tower</option>
-            <option value="Kalutara Tower">Kalutara Tower</option>
+            <option value="">පළමුව Network එක තෝරන්න...</option>
         </select>
 
         <textarea id="commentInput" placeholder="වැඩිදුර විස්තර..."></textarea>
-        
         <button class="post-btn" onclick="sendWhatsApp()">WhatsApp මගින් යවන්න ✅</button>
-        
-        <ul id="commentList"></ul>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // --- Tower Data (මෙතනට ඔයාගේ Tower නම් ටික දාන්න) ---
+        var towerData = {
+            "Dialog": ["Wadduwa Dialog", "Panadura Dialog", "Kalutara Dialog"],
+            "Hutch": ["Wadduwa Hutch", "Molligoda Hutch"],
+            "Mobitel": ["Mobitel Site A", "Mobitel Site B"]
+        };
+
+        // Network එක තේරුවම Tower ලිස්ට් එක වෙනස් කරන function එක
+        function updateTowerList() {
+            var network = document.getElementById('networkSelect').value;
+            var towerSelect = document.getElementById('towerSelect');
+            
+            towerSelect.innerHTML = '<option value="">Tower එක තෝරන්න...</option>'; // කලින් ඒවා අයින් කරන්න
+            
+            if (network && towerData[network]) {
+                towerData[network].forEach(function(tower) {
+                    var option = document.createElement('option');
+                    option.value = tower;
+                    option.text = tower;
+                    towerSelect.appendChild(option);
+                });
+            }
+        }
+
         window.onload = function() {
             setTimeout(function() { document.getElementById('splash').style.display = 'none'; }, 1500); 
         };
@@ -119,33 +119,18 @@
         }
 
         function sendWhatsApp() {
-            var selectedNetwork = document.getElementById('networkSelect').value;
-            var selectedTower = document.getElementById('towerSelect').value;
+            var net = document.getElementById('networkSelect').value;
+            var tower = document.getElementById('towerSelect').value;
             var text = document.getElementById('commentInput').value;
             var myNumber = "947XXXXXXXX"; // *** ඔයාගේ Number එක මෙතනට දාන්න ***
 
-            if(selectedNetwork === "" || selectedTower === "") {
-                alert("කරුණාකර Network එක සහ Tower එක තෝරන්න!");
+            if(!net || !tower || !text.trim()) {
+                alert("කරුණාකර සියලු විස්තර පුරවන්න!");
                 return;
             }
 
-            if(text.trim() !== "") {
-                // WhatsApp message එක ලස්සනට හදන හැටි
-                var fullMsg = "📶 Network: " + selectedNetwork + "\n📍 Tower: " + selectedTower + "\n📝 Info: " + text;
-                var url = "https://wa.me/" + myNumber + "?text=" + encodeURIComponent(fullMsg);
-                
-                window.open(url, '_blank');
-
-                // UI එකේ පෙන්වීමට
-                var li = document.createElement('li');
-                li.className = 'comment-item';
-                li.innerHTML = `<b>${selectedNetwork} - ${selectedTower}:</b> ${text}`;
-                document.getElementById('commentList').prepend(li);
-                
-                document.getElementById('commentInput').value = ''; 
-            } else {
-                alert("කරුණාකර විස්තරයක් ලියන්න!");
-            }
+            var fullMsg = `📶 Network: ${net}\n📍 Tower: ${tower}\n📝 Info: ${text}`;
+            window.open("https://wa.me/" + myNumber + "?text=" + encodeURIComponent(fullMsg), '_blank');
         }
     </script>
 </body>
