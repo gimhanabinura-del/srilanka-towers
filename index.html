@@ -1,43 +1,54 @@
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Sri Lanka Tower Locator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>SL Tower Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { margin: 0; padding: 0; }
         #map { height: 100vh; width: 100%; }
-        .tower-label { font-weight: bold; color: #d32f2f; }
+        .popup-card { font-size: 14px; line-height: 1.6; }
     </style>
 </head>
 <body>
-
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // 1. මැප් එක ලංකාව මැදට සෙට් කිරීම
+        // මැප් එක ලංකාවට සෙට් කිරීම
         var myMap = L.map('map').setView([7.8731, 80.7718], 8);
 
-        // 2. මැප් එකේ පෙනුම (Design එක)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
         }).addTo(myMap);
 
-        // 3. ටවර් ලොකේෂන් (Markers) - උදාහරණ කිහිපයක්
-        // [Latitude, Longitude]
-        
-        // කොළඹ ටවර් එක
-        L.marker([6.9271, 79.8612]).addTo(myMap)
-            .bindPopup("<b style='color:blue;'>Dialog Tower</b><br>Colombo District");
+        // ටවර් දත්ත ඇතුළත් කරන function එක
+        function addTower(lat, lng, name, cellId, bands) {
+            var marker = L.marker([lat, lng]).addTo(myMap);
+            marker.bindPopup(`
+                <div class="popup-card">
+                    <b style="color:#d32f2f;">${name}</b><br>
+                    <b>Cell ID:</b> ${cellId}<br>
+                    <b>Bands:</b> ${bands}<br>
+                    <hr>
+                    <small>Lat: ${lat}, Lng: ${lng}</small>
+                </div>
+            `);
+        }
 
-        // මහනුවර ටවර් එක
-        L.marker([7.2906, 80.6337]).addTo(myMap)
-            .bindPopup("<b style='color:green;'>Mobitel Tower</b><br>Kandy District");
+        // --- මෙතනට ඔයාගේ ටවර් ලැයිස්තුව ඇඩ් කරන්න ---
+        addTower(6.9271, 79.8612, "Dialog Colombo", "54210", "B1, B3, B8");
+        addTower(7.2906, 80.6337, "Mobitel Kandy", "32105", "B1, B3");
+        addTower(6.0535, 80.2210, "Hutch Galle", "11042", "B3, B8");
 
-        // ගාල්ල ටවර් එක
-        L.marker([6.0535, 80.2210]).addTo(myMap)
-            .bindPopup("<b style='color:orange;'>Hutch Tower</b><br>Galle District");
+        // මැප් එක ක්ලික් කළාම ලොකේෂන් එක බලාගන්න
+        myMap.on('click', function(e) {
+            var lat = e.latlng.lat.toFixed(6);
+            var lng = e.latlng.lng.toFixed(6);
+            alert("අලුත් ලොකේෂන් එක:\nLat: " + lat + "\nLng: " + lng);
+        });
 
     </script>
 </body>
