@@ -6,12 +6,12 @@
     <title>Network Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        #map { height: 100vh; width: 100%; position: relative; z-index: 1; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
+        #map { height: 100vh; width: 100%; position: absolute; z-index: 1; background: #f0f0f0; }
 
         .overlay-container {
             position: absolute;
-            top: 10px;
+            top: 15px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
@@ -22,11 +22,11 @@
         .select-box {
             width: 100%;
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 2px solid #1a73e8;
             font-size: 16px;
             background: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             margin-bottom: 10px;
         }
 
@@ -35,11 +35,11 @@
             background: rgba(255, 255, 255, 0.95);
             color: #1a73e8;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 10px;
             text-align: center;
             font-weight: bold;
             font-size: 18px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             border: 1px solid #ddd;
         }
 
@@ -48,20 +48,22 @@
             margin-top: 10px;
             background: white;
             padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             text-align: center;
         }
 
-        .admin-btn {
+        /* රහස් Admin Button එක (තිතක් වගේ පේන්නේ) */
+        .secret-admin {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+            z-index: 2000;
             background: transparent;
-            color: #ccc;
+            color: rgba(0,0,0,0.05); /* ඉතාම අඩුවෙන් පේන්නේ */
             border: none;
             font-size: 10px;
             cursor: pointer;
-            display: block;
-            margin: 0 auto;
-            padding: 5px;
         }
     </style>
 </head>
@@ -78,42 +80,43 @@
         <div id="towerNameBox" class="tower-display"></div>
 
         <div id="adminPanel">
-            <p id="adminHeader" style="margin:0 0 10px 0; font-size:12px; color:#666;"></p>
-            <input type="text" id="newTowerInput" placeholder="නව Tower නම..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box; margin-bottom:10px;">
-            <button onclick="saveTower()" style="width:100%; padding:10px; background:#1a73e8; color:white; border:none; border-radius:4px; font-weight:bold;">Update Tower</button>
+            <input type="text" id="newTowerInput" placeholder="නව Tower නම..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing:border-box; margin-bottom:10px;">
+            <button onclick="saveTower()" style="width:100%; padding:10px; background:#1a73e8; color:white; border:none; border-radius:5px; font-weight:bold;">Update</button>
         </div>
-        
-        <button class="admin-btn" onclick="checkAdmin()">Admin Login</button>
     </div>
 
     <div id="map"></div>
 
+    <button class="secret-admin" onclick="checkAdmin()">.</button>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // ආරම්භක දත්ත (Default Towers)
+        // මුලින් කිසිම නමක් පෙන්වන්නේ නැත (හිස්ව පවතී)
         var towerData = {
-            "Hutch": "📍 Panadura Town Tower",
-            "Mobitel": "📍 Wadduwa Tower",
-            "Dialog": "📍 Dialog Tower"
+            "Hutch": "",
+            "Mobitel": "",
+            "Dialog": ""
         };
 
-        // Browser එකේ කලින් Save කළ දත්ත තිබේ නම් ඒවා ලබා ගනී
         if(localStorage.getItem('networkTowers')) {
             towerData = JSON.parse(localStorage.getItem('networkTowers'));
         }
 
-        // සිතියම සකස් කිරීම
-        var myMap = L.map('map', { zoomControl: false }).setView([6.6621, 79.9348], 14);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
+        var myMap;
+        function initMap() {
+            myMap = L.map('map', { zoomControl: false }).setView([6.6621, 79.9348], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
+            setTimeout(function(){ myMap.invalidateSize(); }, 500);
+        }
+
+        window.onload = initMap;
 
         function updateDisplay() {
             var net = document.getElementById('networkSelect').value;
             var nameBox = document.getElementById('towerNameBox');
-            
-            // Admin panel එක වසා දමයි (Network එක මාරු කරන විට)
             document.getElementById('adminPanel').style.display = 'none';
 
-            if (net !== "" && towerData[net]) {
+            if (net !== "" && towerData[net] && towerData[net] !== "") {
                 nameBox.innerHTML = towerData[net];
                 nameBox.style.display = 'block';
             } else {
@@ -121,45 +124,30 @@
             }
         }
 
-        // Admin Login - Password: 20101027
         function checkAdmin() {
             var net = document.getElementById('networkSelect').value;
-            if (net === "") {
-                alert("කරුණාකර පළමුව Network එකක් තෝරන්න!");
-                return;
-            }
+            if (net === "") { alert("පළමුව Network එකක් තෝරන්න!"); return; }
 
             var pw = prompt("Password එක ඇතුළත් කරන්න:");
             if (pw === "20101027") { 
                 document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('adminHeader').innerHTML = net + " සඳහා අලුත් Tower නමක් දෙන්න:";
             } else {
                 alert("වැරදි Password එකක්!");
             }
         }
 
-        // අදාළ Network එකට විතරක් දත්ත Save කිරීම
         function saveTower() {
             var net = document.getElementById('networkSelect').value;
             var newName = document.getElementById('newTowerInput').value;
-            
-            if (newName.trim() === "") {
-                alert("කරුණාකර නමක් ඇතුළත් කරන්න!");
-                return;
-            }
+            if (newName.trim() === "") { alert("නමක් ඇතුළත් කරන්න!"); return; }
 
-            // අදාළ Network එකේ අගය පමණක් වෙනස් කරයි
             towerData[net] = "📍 " + newName;
-            
-            // මුළු object එකම LocalStorage එකට Save කරයි
             localStorage.setItem('networkTowers', JSON.stringify(towerData));
             
-            alert(net + " Tower එක සාර්ථකව Update වුණා! ✅");
-            updateDisplay(); // Screen එක Update කරයි
-            document.getElementById('newTowerInput').value = ""; // Input එක හිස් කරයි
+            alert(net + " සාර්ථකව Update වුණා!");
+            updateDisplay();
+            document.getElementById('newTowerInput').value = "";
         }
-
-        setTimeout(function(){ myMap.invalidateSize(); }, 500);
     </script>
 </body>
 </html>
