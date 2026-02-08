@@ -41,7 +41,7 @@
         .band-header { background: #333 !important; color: white !important; font-weight: bold; text-align: left !important; padding-left: 10px !important; }
         .table-head { background: #1a73e8; color: white; }
 
-        /* --- Comment Section (මේ කොටස තමයි ඔයා ඇහුවේ) --- */
+        /* Comment Section */
         .comment-area { 
             padding: 20px; background: white; margin: 15px; 
             border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
@@ -52,8 +52,9 @@
             border-radius: 8px; font-size: 14px; box-sizing: border-box; resize: none;
         }
         .post-btn { 
-            margin-top: 10px; padding: 10px 20px; background: #1a73e8; 
+            margin-top: 10px; padding: 10px 20px; background: #25D366; 
             color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;
+            width: 100%;
         }
         #commentList { list-style: none; padding: 0; margin-top: 15px; }
         .comment-item { 
@@ -78,10 +79,9 @@
 
     <div class="comment-area">
         <h3>අදහස් සහ යෝජනා</h3>
-        <textarea id="commentInput" placeholder="comments..."></textarea>
-        <button class="post-btn" onclick="()">Send</button>
-        <ul id="commentList">
-            </ul>
+        <textarea id="commentInput" placeholder="ඔබේ අදහස මෙතන ලියන්න..."></textarea>
+        <button class="post-btn" onclick="sendWhatsApp()">WhatsApp මගින් යවන්න</button>
+        <ul id="commentList"></ul>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -124,15 +124,24 @@
             }
         }
 
-        // --- Comment Function (මේක තමයි Comment එක ඇඩ් කරන්නේ) ---
-        function addComment() {
+        // WhatsApp Function
+        function sendWhatsApp() {
             var text = document.getElementById('commentInput').value;
+            var myNumber = "94765825288"; // *** මෙතනට ඔයාගේ WhatsApp අංකය දාන්න ***
+
             if(text.trim() !== "") {
+                // WhatsApp URL එක සකස් කිරීම
+                var url = "https://wa.me/" + myNumber + "?text=" + encodeURIComponent("Router Home Update: " + text);
+                
+                // අලුත් Tab එකක WhatsApp open කරයි
+                window.open(url, '_blank');
+
+                // List එකටත් add කරයි
                 var li = document.createElement('li');
                 li.className = 'comment-item';
-                li.innerHTML = `<b>Update:</b> ${text}`;
+                li.innerHTML = `<b>WhatsApp Sent:</b> ${text}`;
                 document.getElementById('commentList').prepend(li);
-                document.getElementById('commentInput').value = ''; // Clear box
+                document.getElementById('commentInput').value = ''; 
             } else {
                 alert("කරුණාකර යමක් ලියන්න!");
             }
