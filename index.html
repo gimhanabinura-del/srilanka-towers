@@ -3,56 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Network Tower Map</title>
+    <title>Network Tower Map SL</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
-        #map { height: 100vh; width: 100%; }
+        #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
         .top-container { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 400px; }
         .select-box { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #1a73e8; font-size: 16px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-weight: bold; }
+        .loc-button { position: fixed; bottom: 25px; right: 20px; z-index: 1500; background: white; color: #1a73e8; border: 2px solid #1a73e8; width: 50px; height: 50px; border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
 
     <div class="top-container">
-        <select id="networkSelect" class="select-box" onchange="updateMap()">
+        <select id="networkSelect" class="select-box" onchange="updateTowers()">
             <option value="">ජාලය තෝරන්න (Select Network)</option>
-            <option value="Hutch">Hutch</option>
             <option value="Mobitel">Mobitel</option>
             <option value="Dialog">Dialog</option>
+            <option value="Hutch">Hutch</option>
         </select>
     </div>
 
     <div id="map"></div>
+    <button class="loc-button" onclick="findMe()">📍</button>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // මෙතනට ඔයාට ඕන හැම ටවර් එකක්ම ඇතුළත් කරන්න. එතකොට හැමෝටම පේනවා.
-        const allTowers = [
+        // --- මෙතනට ඔයාගේ Towers වල විස්තර එකතු කරන්න ---
+        // මේ දත්ත ලෝකේ ඕනෑම කෙනෙක්ට පේනවා
+        const towerList = [
             { net: "Mobitel", name: "Panadura Tower", lat: 6.7106, lng: 79.9074 },
-            { net: "Mobitel", name: "Colombo Tower", lat: 6.9271, lng: 79.8612 },
-            { net: "Dialog", name: "Kandy Tower", lat: 7.2906, lng: 80.6337 },
-            { net: "Hutch", name: "Galle Tower", lat: 6.0535, lng: 80.2210 }
+            { net: "Mobitel", name: "Moratuwa Station Tower", lat: 6.7720, lng: 79.8820 },
+            { net: "Dialog", name: "Kandy Center", lat: 7.2906, lng: 80.6337 },
+            { net: "Hutch", name: "Galle Fort", lat: 6.0331, lng: 80.2147 }
+            // තව ටවර් ඕනේ නම් මේ වගේම පල්ලෙහාට දාන්න
         ];
 
         var myMap = L.map('map', { zoomControl: false }).setView([7.8731, 80.7718], 7);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
-        var markerGroup = L.layerGroup().addTo(myMap);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(myMap);
 
-        function updateMap() {
-            var selectedNet = document.getElementById('networkSelect').value;
-            markerGroup.clearLayers();
+        var markers = L.layerGroup().addTo(myMap);
 
-            var filtered = allTowers.filter(t => t.net === selectedNet);
-            
-            if(filtered.length > 0) {
+        function updateTowers() {
+            var selected = document.getElementById('networkSelect').value;
+            markers.clearLayers();
+
+            var filtered = towerList.filter(t => t.net === selected);
+
+            if (filtered.length > 0) {
                 var bounds = [];
                 filtered.forEach(t => {
-                    L.marker([t.lat, t.lng]).bindPopup(`<b>${t.net}</b><br>${t.name}`).addTo(markerGroup);
+                    var m = L.marker([t.lat, t.lng]).bindPopup(`<b>${t.net} Tower</b><br>${t.name}`);
+                    markers.addLayer(m);
                     bounds.push([t.lat, t.lng]);
                 });
-                myMap.fitBounds(bounds, {padding: [50, 50]});
+                myMap.fitBounds(bounds, { padding: [50, 50] });
             }
+        }
+
+        function findMe() {
+            myMap.locate({setView: true, maxZoom: 15});
+            myMap.on('locationfound', function(e) {
+                L.circleMarker(e.latlng, {radius: 10, color: '#1a73e8'}).addTo(myMap).bindPopup("ඔබ සිටින ස්ථානය").openPopup();
+            });
         }
     </script>
 </body>
