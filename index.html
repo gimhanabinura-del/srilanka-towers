@@ -3,69 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Wadduwa Tower Map</title>
+    <title>Wadduwa Tower Map - 4 Cells</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; }
-        #map { height: 100vh; width: 100%; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #f4f4f4; }
+        #map { height: 60vh; width: 100%; border-bottom: 3px solid #d32f2f; }
         
-        /* වගුවේ පෙනුම */
-        .tower-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            font-size: 13px;
+        /* Location Button */
+        .loc-btn {
+            position: absolute; bottom: 80px; right: 10px; z-index: 1000;
+            background: white; border: 2px solid #d32f2f; padding: 10px;
+            border-radius: 50%; cursor: pointer; width: 45px; height: 45px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 20px;
         }
-        .tower-table th, .tower-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        .tower-table th {
-            background-color: #d32f2f;
-            color: white;
-        }
-        .tower-table tr:nth-child(even) { background-color: #f2f2f2; }
-        .popup-title { font-weight: bold; color: #d32f2f; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+
+        /* වගුවේ නව පෙනුම */
+        .tower-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        .tower-table th, .tower-table td { border: 1px solid #ddd; padding: 6px; text-align: center; }
+        .band-header { background-color: #333 !important; color: white !important; font-weight: bold; text-align: left !important; }
+        .table-head { background-color: #d32f2f; color: white; }
+        .popup-title { font-weight: bold; color: #d32f2f; font-size: 16px; margin-bottom: 5px; }
+
+        /* Comment Section */
+        .comment-section { padding: 20px; background: white; }
+        #commentInput { width: 100%; height: 60px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .post-btn { margin-top: 10px; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        #commentList { margin-top: 15px; list-style: none; padding: 0; }
+        .comment-item { background: #eee; padding: 10px; border-radius: 5px; margin-bottom: 8px; border-left: 4px solid #d32f2f; }
     </style>
 </head>
 <body>
 
     <div id="map"></div>
+    <div class="loc-btn" onclick="getLocation()">📍</div>
+
+    <div class="comment-section">
+        <h3>අදහස් සහ යෝජනා</h3>
+        <textarea id="commentInput" placeholder="ටවර් එක ගැන විස්තර මෙතන ලියන්න..."></textarea>
+        <button class="post-btn" onclick="addComment()">Post Comment</button>
+        <ul id="commentList"></ul>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // මැප් එක කෙලින්ම වඩුඩුවට (6.6565, 79.9355) සෙට් කර ඇත
-        var myMap = L.map('map').setView([6.6565, 79.9355], 15);
+        var myMap = L.map('map', { zoomControl: false }).setView([6.6565, 79.9355], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(myMap);
-
-        // ටවර් එක ඇඩ් කරන Function එක
-        function addTower(lat, lng, name, cellDetails) {
-            var marker = L.marker([lat, lng]).addTo(myMap);
-            marker.bindPopup(`
-                <div class="popup-title">${name}</div>
-                <table class="tower-table">
-                    <tr>
-                        <th>PCI</th>
-                        <th>Cell ID</th>
-                        <th>Bands</th>
-                    </tr>
-                    ${cellDetails}
-                </table>
-                <p style="font-size:10px; color:gray; margin-top:10px;">Coordinates: ${lat}, ${lng}</p>
-            `).openPopup(); // මැප් එක ලෝඩ් වෙද්දීම Popup එක ඇරිලා තියෙන්න
+        function addTower(lat, lng, name, tableContent) {
+            L.marker([lat, lng]).addTo(myMap)
+                .bindPopup(`
+                    <div style="max-height: 300px; overflow-y: auto; width: 220px;">
+                        <div class="popup-title">${name}</div>
+                        <table class="tower-table">
+                            <tr class="table-head">
+                                <th>PCI</th>
+                                <th>Cell ID</th>
+                            </tr>
+                            ${tableContent}
+                        </table>
+                    </div>
+                `).openPopup();
         }
 
-        // --- වඩුඩුව ටවර් එකේ දත්ත පමණි ---
+        // --- වඩුඩුව ටවර් එක (හැම Band එකටම පේළි 4 බැගින්) ---
         addTower(6.6565, 79.9355, "Wadduwa Town Tower", `
-            <tr><td>142</td><td>25410</td><td>B3 (1800)</td></tr>
-            <tr><td>143</td><td>25411</td><td>B1 (2100)</td></tr>
-            <tr><td>88</td><td>25412</td><td>B8 (900)</td></tr>
+            <tr class="band-header"><td colspan="2">Band 1 (2100MHz)</td></tr>
+            <tr><td>-</td><td>-</td></tr><tr><td>-</td><td>-</td></tr><tr><td>-</td><td>-</td></tr><tr><td>-</td><td>-</td></tr>
+            
+            <tr class="band-header"><td colspan="2">Band 3 (1800MHz)</td></tr>
+            <tr><td>-</td><td>-</td></tr><tr><td>-</td><td>-</td></tr><tr><td>-</td><td>-</td></tr><tr><td>-</td><td>-</td></tr>
+            
+            <tr class="band-header"><td colspan="2">Band 5 (850MHz)</td></tr>
+            <tr><td>-</td><td>-</td></tr><tr><td>-</td><td>-</td></tr><tr><td>-</td><td>-</td></tr><tr><td>-</td><td>-</td></tr>
+            
+            <tr class="band-header"><td colspan="2">Band 38 / 41 (TDD)</td></tr>
+            <tr><td>-</td><td>-</td></tr><tr><td>-</td><td>-</td></tr><tr><td>-</td><td>-</td></tr><tr><td>-</td><td>-</td></tr>
         `);
 
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    L.circleMarker([lat, lng], {radius: 8, color: 'blue'}).addTo(myMap).bindPopup("ඔබ මෙතැනයි").openPopup();
+                    myMap.setView([lat, lng], 16);
+                });
+            }
+        }
+
+        function addComment() {
+            var text = document.getElementById('commentInput').value;
+            if(text) {
+                var li = document.createElement('li');
+                li.className = 'comment-item';
+                li.innerHTML = `<b>User:</b> ${text}`;
+                document.getElementById('commentList').prepend(li);
+                document.getElementById('commentInput').value = '';
+            }
+        }
     </script>
 </body>
 </html>
