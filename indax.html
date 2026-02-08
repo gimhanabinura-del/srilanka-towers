@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SL Tower Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style> body { margin: 0; } #map { height: 100vh; } </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([6.9271, 79.8612], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        // මෙතනට ඔයාට ඕනෙම ලොකේෂන් එකක් දෙන්න පුළුවන්
+        L.marker([6.9271, 79.8612]).addTo(map).bindPopup('<b>Colombo Tower</b>').openPopup();
+    </script>
+</body>
+</html>
