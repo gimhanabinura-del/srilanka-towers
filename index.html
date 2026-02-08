@@ -3,121 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>SL Tower App Pro</title>
-    
+    <title>Wadduwa Tower Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
     <style>
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #f4f4f4; }
-        #map { height: 70vh; width: 100%; border-bottom: 3px solid #d32f2f; }
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #map { height: 100vh; width: 100%; }
         
-        /* Search Bar */
-        .search-container {
-            position: absolute; top: 10px; left: 10px; z-index: 1000;
-            display: flex; width: calc(100% - 70px); max-width: 300px;
+        /* වගුවේ පෙනුම */
+        .tower-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
         }
-        #searchInput {
-            flex: 1; padding: 12px; border: none;
-            border-radius: 8px 0 0 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        .tower-table th, .tower-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
         }
-        #searchBtn {
-            padding: 12px; background: #d32f2f; color: white;
-            border: none; border-radius: 0 8px 8px 0; cursor: pointer;
+        .tower-table th {
+            background-color: #d32f2f;
+            color: white;
         }
-
-        /* Comment Box Section */
-        .comment-section { padding: 20px; background: white; }
-        .comment-header { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #333; }
-        #commentInput {
-            width: 100%; height: 80px; padding: 10px; 
-            border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;
-        }
-        .post-btn {
-            margin-top: 10px; padding: 10px 20px; background: #28a745;
-            color: white; border: none; border-radius: 5px; cursor: pointer;
-        }
-        #commentList { margin-top: 20px; list-style: none; padding: 0; }
-        .comment-item { 
-            background: #f9f9f9; padding: 10px; border-radius: 5px; 
-            margin-bottom: 10px; border-left: 4px solid #d32f2f;
-        }
-
-        /* Popup Style */
-        .tower-name { color: #d32f2f; font-weight: bold; font-size: 15px; }
+        .tower-table tr:nth-child(even) { background-color: #f2f2f2; }
+        .popup-title { font-weight: bold; color: #d32f2f; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
     </style>
 </head>
 <body>
 
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="නගරය සර්ච් කරන්න...">
-        <button id="searchBtn">🔍</button>
-    </div>
-
     <div id="map"></div>
-
-    <div class="comment-section">
-        <div class="comment-header">අදහස් සහ යෝජනා (Comments)</div>
-        <textarea id="commentInput" placeholder="comments..."></textarea>
-        <button class="post-btn" onclick="addComment()">Post Comment</button>
-        
-        <ul id="commentList">
-            <li class="comment-item"><b>Admin:</b> සාදරයෙන් පිළිගන්නවා!.</li>
-        </ul>
-    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // 1. මැප් එක සකස් කිරීම
-        var myMap = L.map('map', { zoomControl: false }).setView([7.8731, 80.7718], 8);
-        L.control.zoom({ position: 'bottomright' }).addTo(myMap);
+        // මැප් එක කෙලින්ම වඩුඩුවට (6.6565, 79.9355) සෙට් කර ඇත
+        var myMap = L.map('map').setView([6.6565, 79.9355], 15);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(myMap);
 
-        // 2. ටවර් ඇඩ් කරන Function එක
-        function addTower(lat, lng, name, cellId, bands) {
-            L.marker([lat, lng]).addTo(myMap)
-                .bindPopup(`
-                    <div class="popup-card">
-                        <span class="tower-name">${name}</span><br>
-                        <b>Cell IDs:</b><br>${cellId}<br>
-                        <b>Bands:</b> ${bands}
-                    </div>
-                `);
+        // ටවර් එක ඇඩ් කරන Function එක
+        function addTower(lat, lng, name, cellDetails) {
+            var marker = L.marker([lat, lng]).addTo(myMap);
+            marker.bindPopup(`
+                <div class="popup-title">${name}</div>
+                <table class="tower-table">
+                    <tr>
+                        <th>PCI</th>
+                        <th>Cell ID</th>
+                        <th>Bands</th>
+                    </tr>
+                    ${cellDetails}
+                </table>
+                <p style="font-size:10px; color:gray; margin-top:10px;">Coordinates: ${lat}, ${lng}</p>
+            `).openPopup(); // මැප් එක ලෝඩ් වෙද්දීම Popup එක ඇරිලා තියෙන්න
         }
 
-        // ටවර් දත්ත (මෙතනට අලුත් ඒවා ඇඩ් කරන්න)
-        addTower(6.9271, 79.8612, "Dialog ", "54211, 54212", "B1, 41, B3");
-        addTower(7.2906, 80.6337, "Mobitel ", "32101, 32102", "B1, B8");
-        addTower(7.2906, 80.6347, "hutch ", "32101, 32102", "B1, B8");
-        // 3. Search Function
-        document.getElementById('searchBtn').onclick = function() {
-            var city = document.getElementById('searchInput').value;
-            if(city) {
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${city}, Sri Lanka`)
-                .then(res => res.json()).then(data => {
-                    if(data.length > 0) myMap.setView([data[0].lat, data[0].lon], 14);
-                });
-            }
-        };
+        // --- වඩුඩුව ටවර් එකේ දත්ත පමණි ---
+        addTower(6.6565, 79.9355, "Wadduwa Town Tower", `
+            <tr><td>142</td><td>25410</td><td>B3 (1800)</td></tr>
+            <tr><td>143</td><td>25411</td><td>B1 (2100)</td></tr>
+            <tr><td>88</td><td>25412</td><td>B8 (900)</td></tr>
+        `);
 
-        // 4. Comment Function
-        function addComment() {
-            var text = document.getElementById('commentInput').value;
-            if(text) {
-                var li = document.createElement('li');
-                li.className = 'comment-item';
-                li.innerHTML = `<b>User:</b> ${text}`;
-                document.getElementById('commentList').prepend(li);
-                document.getElementById('commentInput').value = '';
-            }
-        }
-
-        // මැප් එක ක්ලික් කළාම ලොකේෂන් එක බලාගන්න
-        myMap.on('click', function(e) {
-            L.popup().setLatLng(e.latlng)
-                .setContent("Lat: " + e.latlng.lat.toFixed(6) + "<br>Lng: " + e.latlng.lng.toFixed(6))
-                .openOn(myMap);
-        });
     </script>
 </body>
 </html>
