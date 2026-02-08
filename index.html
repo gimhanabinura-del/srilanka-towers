@@ -7,96 +7,106 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
+        
+        /* Splash Screen */
         #splash {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #ffffff; display: flex; flex-direction: column;
             align-items: center; justify-content: center; z-index: 9999;
-            transition: opacity 0.8s ease;
         }
-        .biz-name { font-size: 28px; font-weight: bold; color: #1a73e8; margin: 10px 0; }
+
         .header {
             background: #1a73e8; color: white; padding: 15px;
-            text-align: center; font-size: 22px; font-weight: bold;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            text-align: center; font-size: 20px; font-weight: bold;
         }
+
         #map { height: 45vh; width: 100%; border-bottom: 4px solid #1a73e8; }
-        .loc-btn {
-            position: absolute; top: 90px; right: 10px; z-index: 1000;
-            background: white; border: 2px solid #1a73e8; padding: 10px;
-            border-radius: 50%; cursor: pointer; width: 45px; height: 45px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2); font-size: 22px;
-        }
+
         .comment-area { 
             padding: 20px; background: white; margin: 15px; 
-            border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
         }
+
         .select-box, #commentInput { 
-            width: 100%; padding: 12px; border: 1px solid #ccc; 
-            border-radius: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 10px;
+            width: 100%; padding: 12px; border: 1px solid #ddd; 
+            border-radius: 8px; font-size: 15px; box-sizing: border-box; margin-bottom: 12px;
+            display: block;
         }
-        #commentInput { height: 70px; resize: none; }
+
+        /* Tower box එක මුලින්ම පේන්නේ නැති වෙන්න */
+        #towerContainer { display: none; }
+
+        #commentInput { height: 80px; resize: none; }
+
         .post-btn { 
-            padding: 12px; background: #25D366; 
-            color: white; border: none; border-radius: 5px; cursor: pointer; 
+            padding: 14px; background: #25D366; 
+            color: white; border: none; border-radius: 8px; cursor: pointer; 
             font-weight: bold; width: 100%; font-size: 16px;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
         }
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <div id="splash">
-        <div class="biz-name">Router Home</div>
+        <div style="font-size: 24px; font-weight: bold; color: #1a73e8; margin-bottom: 10px;">Router Home</div>
         <div style="border: 4px solid #f3f3f3; border-top: 4px solid #1a73e8; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite;"></div>
     </div>
 
     <div class="header">Router Home - Network Map</div>
 
     <div id="map"></div>
-    <div class="loc-btn" onclick="getLocation()">📍</div>
 
     <div class="comment-area">
-        <h3>Network Update</h3>
+        <h3 style="margin-top:0; font-size: 18px; color: #333;">Tower Update</h3>
         
-        <select id="networkSelect" class="select-box" onchange="updateTowerList()">
+        <label style="font-size: 13px; color: #666;">පියවර 1: ජාලය තෝරන්න</label>
+        <select id="networkSelect" class="select-box" onchange="showTowers()">
             <option value="">Network එක තෝරන්න...</option>
             <option value="Dialog">Dialog</option>
             <option value="Hutch">Hutch</option>
             <option value="Mobitel">Mobitel</option>
         </select>
 
-        <select id="towerSelect" class="select-box">
-            <option value="">පළමුව Network එක තෝරන්න...</option>
-        </select>
-
-        <textarea id="commentInput" placeholder="වැඩිදුර විස්තර..."></textarea>
-        <button class="post-btn" onclick="sendWhatsApp()">WhatsApp මගින් යවන්න ✅</button>
+        <div id="towerContainer">
+            <label style="font-size: 13px; color: #666;">පියවර 2: කුළුණ තෝරන්න</label>
+            <select id="towerSelect" class="select-box">
+                </select>
+            
+            <textarea id="commentInput" placeholder="ඔබේ අදහස මෙතන ලියන්න..."></textarea>
+            <button class="post-btn" onclick="sendWhatsApp()">WhatsApp පණිවිඩය යවන්න ✅</button>
+        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- Tower Data (මෙතනට ඔයාගේ Tower නම් ටික දාන්න) ---
+        // --- Tower Data ---
         var towerData = {
-            "Dialog": ["Wadduwa Dialog", "Panadura Dialog", "Kalutara Dialog"],
-            "Hutch": ["Wadduwa Hutch", "Molligoda Hutch"],
-            "Mobitel": ["Mobitel Site A", "Mobitel Site B"]
+            "Dialog": ["Wadduwa Dialog", "Panadura Dialog", "Kalutara South Dialog"],
+            "Hutch": ["Wadduwa Hutch", "Molligoda Hutch", "Dibbedda Hutch"],
+            "Mobitel": ["Mobitel Site 01", "Mobitel Site 02"]
         };
 
-        // Network එක තේරුවම Tower ලිස්ට් එක වෙනස් කරන function එක
-        function updateTowerList() {
-            var network = document.getElementById('networkSelect').value;
+        function showTowers() {
+            var net = document.getElementById('networkSelect').value;
+            var container = document.getElementById('towerContainer');
             var towerSelect = document.getElementById('towerSelect');
-            
-            towerSelect.innerHTML = '<option value="">Tower එක තෝරන්න...</option>'; // කලින් ඒවා අයින් කරන්න
-            
-            if (network && towerData[network]) {
-                towerData[network].forEach(function(tower) {
-                    var option = document.createElement('option');
-                    option.value = tower;
-                    option.text = tower;
-                    towerSelect.appendChild(option);
+
+            if (net !== "") {
+                // Tower ලිස්ට් එක Update කරනවා
+                towerSelect.innerHTML = '<option value="">Tower එක තෝරන්න...</option>';
+                towerData[net].forEach(function(t) {
+                    var opt = document.createElement('option');
+                    opt.value = t;
+                    opt.text = t;
+                    towerSelect.appendChild(opt);
                 });
+                // පේන්න සලස්වනවා
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
             }
         }
 
@@ -107,29 +117,18 @@
         var myMap = L.map('map', { zoomControl: false }).setView([6.6621, 79.9348], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
 
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var lat = position.coords.latitude;
-                    var lng = position.coords.longitude;
-                    L.circleMarker([lat, lng], {radius: 8, color: 'blue'}).addTo(myMap).bindPopup("You are here").openPopup();
-                    myMap.setView([lat, lng], 17);
-                });
-            }
-        }
-
         function sendWhatsApp() {
             var net = document.getElementById('networkSelect').value;
             var tower = document.getElementById('towerSelect').value;
             var text = document.getElementById('commentInput').value;
-            var myNumber = "947XXXXXXXX"; // *** ඔයාගේ Number එක මෙතනට දාන්න ***
+            var myNumber = "947XXXXXXXX"; // *** ඔයාගේ Number එක දාන්න ***
 
-            if(!net || !tower || !text.trim()) {
+            if(!tower || !text.trim()) {
                 alert("කරුණාකර සියලු විස්තර පුරවන්න!");
                 return;
             }
 
-            var fullMsg = `📶 Network: ${net}\n📍 Tower: ${tower}\n📝 Info: ${text}`;
+            var fullMsg = `*Router Home Update*\n\n📶 *Network:* ${net}\n📍 *Tower:* ${tower}\n📝 *Info:* ${text}`;
             window.open("https://wa.me/" + myNumber + "?text=" + encodeURIComponent(fullMsg), '_blank');
         }
     </script>
