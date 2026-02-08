@@ -20,7 +20,7 @@
             text-align: center; font-size: 20px; font-weight: bold;
         }
 
-        #map { height: 45vh; width: 100%; border-bottom: 4px solid #1a73e8; }
+        #map { height: 50vh; width: 100%; border-bottom: 4px solid #1a73e8; }
 
         .comment-area { 
             padding: 20px; background: white; margin: 15px; 
@@ -30,11 +30,10 @@
         .select-box, #commentInput { 
             width: 100%; padding: 12px; border: 1px solid #ddd; 
             border-radius: 8px; font-size: 15px; box-sizing: border-box; margin-bottom: 12px;
-            display: block;
         }
 
-        /* Tower box එක මුලින්ම පේන්නේ නැති වෙන්න */
-        #towerContainer { display: none; }
+        /* Input සහ Button එක මුලින්ම සඟවා තැබීමට */
+        #inputSection { display: none; }
 
         #commentInput { height: 80px; resize: none; }
 
@@ -42,7 +41,6 @@
             padding: 14px; background: #25D366; 
             color: white; border: none; border-radius: 8px; cursor: pointer; 
             font-weight: bold; width: 100%; font-size: 16px;
-            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
         }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -60,53 +58,32 @@
     <div id="map"></div>
 
     <div class="comment-area">
-        <h3 style="margin-top:0; font-size: 18px; color: #333;">Tower Update</h3>
+        <h3 style="margin-top:0; font-size: 18px; color: #333;">Network Update</h3>
         
-        <label style="font-size: 13px; color: #666;">පියවර 1: ජාලය තෝරන්න</label>
-        <select id="networkSelect" class="select-box" onchange="showTowers()">
+        <label style="font-size: 13px; color: #666;">ජාලය තෝරන්න:</label>
+        <select id="networkSelect" class="select-box" onchange="showInput()">
             <option value="">Network එක තෝරන්න...</option>
             <option value="Dialog">Dialog</option>
             <option value="Hutch">Hutch</option>
             <option value="Mobitel">Mobitel</option>
         </select>
 
-        <div id="towerContainer">
-            <label style="font-size: 13px; color: #666;">පියවර 2: කුළුණ තෝරන්න</label>
-            <select id="towerSelect" class="select-box">
-                </select>
-            
+        <div id="inputSection">
             <textarea id="commentInput" placeholder="ඔබේ අදහස මෙතන ලියන්න..."></textarea>
-            <button class="post-btn" onclick="sendWhatsApp()">WhatsApp පණිවිඩය යවන්න ✅</button>
+            <button class="post-btn" onclick="sendWhatsApp()">WhatsApp මගින් යවන්න ✅</button>
         </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- Tower Data ---
-        var towerData = {
-            "Dialog": ["Wadduwa Dialog", "Panadura Dialog", "Kalutara South Dialog"],
-            "Hutch": ["Wadduwa Hutch", "Molligoda Hutch", "Dibbedda Hutch"],
-            "Mobitel": ["Mobitel Site 01", "Mobitel Site 02"]
-        };
-
-        function showTowers() {
+        function showInput() {
             var net = document.getElementById('networkSelect').value;
-            var container = document.getElementById('towerContainer');
-            var towerSelect = document.getElementById('towerSelect');
+            var inputSection = document.getElementById('inputSection');
 
             if (net !== "") {
-                // Tower ලිස්ට් එක Update කරනවා
-                towerSelect.innerHTML = '<option value="">Tower එක තෝරන්න...</option>';
-                towerData[net].forEach(function(t) {
-                    var opt = document.createElement('option');
-                    opt.value = t;
-                    opt.text = t;
-                    towerSelect.appendChild(opt);
-                });
-                // පේන්න සලස්වනවා
-                container.style.display = 'block';
+                inputSection.style.display = 'block';
             } else {
-                container.style.display = 'none';
+                inputSection.style.display = 'none';
             }
         }
 
@@ -119,16 +96,15 @@
 
         function sendWhatsApp() {
             var net = document.getElementById('networkSelect').value;
-            var tower = document.getElementById('towerSelect').value;
             var text = document.getElementById('commentInput').value;
-            var myNumber = "947XXXXXXXX"; // *** ඔයාගේ Number එක දාන්න ***
+            var myNumber = "947XXXXXXXX"; // *** මෙතනට ඔයාගේ අංකය දාන්න ***
 
-            if(!tower || !text.trim()) {
-                alert("කරුණාකර සියලු විස්තර පුරවන්න!");
+            if(text.trim() === "") {
+                alert("කරුණාකර යමක් ලියන්න!");
                 return;
             }
 
-            var fullMsg = `*Router Home Update*\n\n📶 *Network:* ${net}\n📍 *Tower:* ${tower}\n📝 *Info:* ${text}`;
+            var fullMsg = `*Router Home Update*\n\n📶 *Network:* ${net}\n📝 *Info:* ${text}`;
             window.open("https://wa.me/" + myNumber + "?text=" + encodeURIComponent(fullMsg), '_blank');
         }
     </script>
