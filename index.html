@@ -3,120 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Network Tower Map Pro</title>
+    <title>Router Home - Official Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
         #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
 
-        /* ඉහළ ඇති Network Select Box එක */
+        /* Header Area */
+        .business-header {
+            position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            z-index: 1100; text-align: center; width: 100%;
+        }
+        .business-name {
+            background: #1a73e8; color: white; padding: 8px 25px;
+            border-radius: 50px; font-size: 22px; font-weight: bold;
+            display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 2px solid white;
+        }
+
         .top-container {
-            position: absolute;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: 90%;
-            max-width: 400px;
+            position: absolute; top: 70px; left: 50%; transform: translateX(-50%);
+            z-index: 1000; width: 90%; max-width: 400px;
         }
 
         .select-box {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 2px solid #1a73e8;
-            font-size: 16px;
-            background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            font-weight: bold;
+            width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #1a73e8;
+            font-size: 16px; background: white; font-weight: bold; text-align: center;
         }
 
-        /* මැදින් මතුවන Admin Panel එක */
+        /* Floating Buttons Group */
+        .btn-group { position: fixed; bottom: 20px; right: 20px; z-index: 1500; display: flex; flex-direction: column; gap: 10px; }
+        
+        .floating-btn {
+            width: 50px; height: 50px; border-radius: 50%; display: flex; 
+            align-items: center; justify-content: center; text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: none; cursor: pointer;
+        }
+
+        .fb-btn { background: #1877F2; color: white; font-size: 26px; font-weight: bold; }
+        .wa-btn { background: #25d366; }
+        .lc-btn { background: white; color: #1a73e8; border: 2px solid #1a73e8; font-size: 22px; }
+        .ad-btn { background: #333; color: white; font-size: 25px; }
+
+        /* Admin Layout */
         #adminPanel {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2000;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: 85%;
-            max-width: 320px;
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 2000; background: white; padding: 20px; border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 85%; max-width: 320px;
         }
-
-        .admin-input {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        .btn-save {
-            width: 100%;
-            padding: 12px;
-            background: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-clear {
-            width: 100%;
-            padding: 8px;
-            background: #ff4444;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-
-        /* Current Location බොත්තම */
-        .loc-button {
-            position: fixed;
-            bottom: 85px;
-            right: 20px;
-            z-index: 1500;
-            background: white;
-            color: #1a73e8;
-            border: 2px solid #1a73e8;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            font-size: 22px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* රහස් Admin බොත්තම (තිත) */
-        .secret-admin {
-            position: fixed;
-            bottom: 25px;
-            right: 20px;
-            z-index: 1500;
-            background: #1a73e8;
-            color: white;
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            font-size: 28px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
+        .admin-input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
     </style>
 </head>
 <body>
+
+    <div class="business-header">
+        <div class="business-name">ROUTER HOME</div>
+    </div>
 
     <div class="top-container">
         <select id="networkSelect" class="select-box" onchange="updateDisplay()">
@@ -127,129 +69,79 @@
         </select>
     </div>
 
+    <div class="btn-group">
+        <a href="https://www.facebook.com/share/1CMKzHNNiM/" target="_blank" class="floating-btn fb-btn" title="Facebook">f</a>
+        
+        <a href="https://wa.me/94765825288" target="_blank" class="floating-btn wa-btn" title="WhatsApp">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.94 3.659 1.437 5.634 1.437h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+
+        <button class="floating-btn lc-btn" onclick="findMyLocation()">📍</button>
+        
+        <button class="floating-btn ad-btn" onclick="openAdmin()">•</button>
+    </div>
+
     <div id="adminPanel">
-        <h3 style="margin-top:0; color:#1a73e8; text-align:center;">Admin Settings</h3>
-        <label style="font-size:12px;">Network එක තෝරන්න:</label>
+        <h3 style="margin:0; color:#1a73e8; text-align:center;">Router Home Admin</h3>
         <select id="adminNetSelect" class="admin-input">
             <option value="Hutch">Hutch</option>
             <option value="Mobitel">Mobitel</option>
             <option value="Dialog">Dialog</option>
         </select>
-        <input type="text" id="towerName" class="admin-input" placeholder="Tower නම (උදා: Panadura)">
-        <input type="number" id="towerLat" class="admin-input" step="any" placeholder="Latitude (අක්ෂාංශ)">
-        <input type="number" id="towerLng" class="admin-input" step="any" placeholder="Longitude (දේශාංශ)">
-        
-        <button class="btn-save" onclick="saveTower()">Tower එක ඇතුළත් කරන්න</button>
-        <button class="btn-clear" onclick="clearAllData()">සියලුම දත්ත මකන්න</button>
-        <button onclick="closeAdmin()" style="width:100%; border:none; background:none; margin-top:10px; color:#666; cursor:pointer;">Close</button>
+        <input type="text" id="towerName" class="admin-input" placeholder="Tower නම">
+        <input type="number" id="towerLat" class="admin-input" step="any" placeholder="Latitude">
+        <input type="number" id="towerLng" class="admin-input" step="any" placeholder="Longitude">
+        <button onclick="saveTower()" style="width:100%; padding:12px; background:#1a73e8; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">Save Tower</button>
+        <button onclick="closeAdmin()" style="width:100%; border:none; background:none; margin-top:10px; color:#666;">Close</button>
     </div>
 
     <div id="map"></div>
 
-    <button class="loc-button" onclick="findMyLocation()">📍</button>
-    <button class="secret-admin" onclick="openAdmin()">•</button>
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // දත්ත ආරම්භ කිරීම
         var networkData = { "Hutch": [], "Mobitel": [], "Dialog": [] };
+        if(localStorage.getItem('myNetworkData')) networkData = JSON.parse(localStorage.getItem('myNetworkData'));
 
-        // කලින් සේව් කළ දත්ත ඇත්නම් ලබා ගැනීම
-        if(localStorage.getItem('myNetworkData')) {
-            networkData = JSON.parse(localStorage.getItem('myNetworkData'));
-        }
-
-        var myMap;
-        var markerGroup = L.layerGroup();
-        var userMarker;
+        var myMap, markerGroup = L.layerGroup();
 
         function initMap() {
-            // ශ්‍රී ලංකාව මැදට සිතියම සකස් කිරීම
             myMap = L.map('map', { zoomControl: false }).setView([7.8731, 80.7718], 7);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(myMap);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
             markerGroup.addTo(myMap);
         }
 
         window.onload = initMap;
 
-        // දැනට ඉන්න තැන සෙවීම
         function findMyLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var lat = position.coords.latitude;
-                    var lng = position.coords.longitude;
-                    if (userMarker) { myMap.removeLayer(userMarker); }
-                    userMarker = L.circleMarker([lat, lng], { radius: 10, color: '#1a73e8', fillColor: '#1a73e8', fillOpacity: 0.5 }).addTo(myMap);
-                    userMarker.bindPopup("ඔබ සිටින ස්ථානය").openPopup();
-                    myMap.setView([lat, lng], 14);
-                }, function() {
-                    alert("Location access denied.");
+                navigator.geolocation.getCurrentPosition(function(p) {
+                    myMap.setView([p.coords.latitude, p.coords.longitude], 15);
                 });
             }
         }
 
-        // සිතියමේ Tower පෙන්වීම
         function updateDisplay() {
             var net = document.getElementById('networkSelect').value;
             markerGroup.clearLayers();
-
             if (net !== "" && networkData[net].length > 0) {
                 var bounds = [];
-                networkData[net].forEach(function(tower) {
-                    var m = L.marker([tower.lat, tower.lng]).bindPopup("<b>" + net + " Tower</b><br>" + tower.name);
-                    markerGroup.addLayer(m);
-                    bounds.push([tower.lat, tower.lng]);
+                networkData[net].forEach(function(t) {
+                    L.marker([t.lat, t.lng]).bindPopup("<b>" + net + " Tower</b><br>" + t.name).addTo(markerGroup);
+                    bounds.push([t.lat, t.lng]);
                 });
                 myMap.fitBounds(bounds, { padding: [50, 50] });
             }
         }
 
-        // Admin Panel Functions
-        function openAdmin() {
-            var pw = prompt("Password එක ඇතුළත් කරන්න:");
-            if (pw === "20101027") {
-                document.getElementById('adminPanel').style.display = 'block';
-            } else {
-                alert("වැරදි රහස් අංකයක්!");
-            }
-        }
-
-        function closeAdmin() {
-            document.getElementById('adminPanel').style.display = 'none';
-        }
+        function openAdmin() { if (prompt("Password:") === "20101027") document.getElementById('adminPanel').style.display = 'block'; }
+        function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
 
         function saveTower() {
-            var net = document.getElementById('adminNetSelect').value;
-            var name = document.getElementById('towerName').value;
-            var lat = parseFloat(document.getElementById('towerLat').value);
-            var lng = parseFloat(document.getElementById('towerLng').value);
-
-            if (!name || isNaN(lat) || isNaN(lng)) {
-                alert("සියලු විස්තර නිවැරදිව පුරවන්න!");
-                return;
-            }
-
-            networkData[net].push({ name: name, lat: lat, lng: lng });
-            localStorage.setItem('myNetworkData', JSON.stringify(networkData));
-            
-            alert(name + " සාර්ථකව ඇතුළත් කළා!");
-            updateDisplay();
-            
-            // Fields හිස් කිරීම
-            document.getElementById('towerName').value = "";
-            document.getElementById('towerLat').value = "";
-            document.getElementById('towerLng').value = "";
-        }
-
-        function clearAllData() {
-            if(confirm("ඇතුළත් කර ඇති සියලුම කුළුණු දත්ත මකා දැමීමට ඔබට සහතිකද?")) {
-                localStorage.removeItem('myNetworkData');
-                networkData = { "Hutch": [], "Mobitel": [], "Dialog": [] };
-                markerGroup.clearLayers();
-                alert("දත්ත සියල්ල මකා දැමුවා.");
-                location.reload();
+            var net = document.getElementById('adminNetSelect').value, name = document.getElementById('towerName').value, lat = parseFloat(document.getElementById('towerLat').value), lng = parseFloat(document.getElementById('towerLng').value);
+            if (name && !isNaN(lat) && !isNaN(lng)) {
+                networkData[net].push({ name: name, lat: lat, lng: lng });
+                localStorage.setItem('myNetworkData', JSON.stringify(networkData));
+                alert("Saved to Router Home Database!"); updateDisplay();
             }
         }
     </script>
