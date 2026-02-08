@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Network Map</title>
+    <title>Network Map Admin</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
-        #map { height: 100vh; width: 100%; position: absolute; z-index: 1; background: #f0f0f0; }
+        #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
 
-        .overlay-container {
+        /* Main Dropdown */
+        .top-container {
             position: absolute;
             top: 15px;
             left: 50%;
@@ -26,83 +27,134 @@
             border: 2px solid #1a73e8;
             font-size: 16px;
             background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
+        /* Admin Panel */
         #adminPanel {
             display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
             background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 85%;
+            max-width: 320px;
         }
 
+        #adminPanel h3 { margin-top: 0; color: #1a73e8; text-align: center; }
+
+        .admin-input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 12px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-close {
+            width: 100%;
+            padding: 8px;
+            background: #666;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+
+        /* Secret Button */
         .secret-admin {
             position: fixed;
-            bottom: 5px;
-            right: 5px;
-            z-index: 2000;
-            background: transparent;
-            color: rgba(0,0,0,0.05);
+            bottom: 20px;
+            right: 20px;
+            z-index: 1500;
+            background: #1a73e8;
+            color: white;
             border: none;
-            font-size: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
             cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
 
-    <div class="overlay-container">
+    <div class="top-container">
         <select id="networkSelect" class="select-box" onchange="updateDisplay()">
             <option value="">ජාලය තෝරන්න (Select Network)</option>
             <option value="Hutch">Hutch</option>
             <option value="Mobitel">Mobitel</option>
             <option value="Dialog">Dialog</option>
         </select>
+    </div>
 
-        <div id="adminPanel">
-            <input type="text" id="towerName" placeholder="Tower නම" style="width:100%; margin-bottom:5px; padding:8px;">
-            <input type="text" id="towerLat" placeholder="Latitude (අක්ෂාංශ)" style="width:100%; margin-bottom:5px; padding:8px;">
-            <input type="text" id="towerLng" placeholder="Longitude (දේශාංශ)" style="width:100%; margin-bottom:10px; padding:8px;">
-            <button onclick="saveTower()" style="width:100%; padding:10px; background:#1a73e8; color:white; border:none; border-radius:5px; font-weight:bold;">Tower එක එක් කරන්න</button>
-        </div>
+    <div id="adminPanel">
+        <h3>Admin Panel</h3>
+        <label>Network එක තෝරන්න:</label>
+        <select id="adminNetSelect" class="admin-input">
+            <option value="Hutch">Hutch</option>
+            <option value="Mobitel">Mobitel</option>
+            <option value="Dialog">Dialog</option>
+        </select>
+        
+        <input type="text" id="towerName" class="admin-input" placeholder="Tower නම (උදා: Wadduwa Town)">
+        <input type="number" id="towerLat" class="admin-input" step="any" placeholder="Latitude (අක්ෂාංශ)">
+        <input type="number" id="towerLng" class="admin-input" step="any" placeholder="Longitude (දේශාංශ)">
+        
+        <button class="btn-save" onclick="saveTower()">Save Tower</button>
+        <button class="btn-close" onclick="closeAdmin()">Close</button>
     </div>
 
     <div id="map"></div>
 
-    <button class="secret-admin" onclick="checkAdmin()">.</button>
+    <button class="secret-admin" onclick="openAdmin()">•</button>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // දත්ත ගබඩාව (Network අනුව කුළුණු ලැයිස්තු)
-        var networkData = {
-            "Hutch": [],
-            "Mobitel": [],
-            "Dialog": []
-        };
+        var networkData = { "Hutch": [], "Mobitel": [], "Dialog": [] };
 
         // කලින් සේව් කළ දත්ත ඇත්නම් ලබා ගැනීම
-        if(localStorage.getItem('myNetworkTowers')) {
-            networkData = JSON.parse(localStorage.getItem('myNetworkTowers'));
+        if(localStorage.getItem('myNetworkData')) {
+            networkData = JSON.parse(localStorage.getItem('myNetworkData'));
         }
 
         var myMap;
         var markerGroup = L.layerGroup();
 
         function initMap() {
-            myMap = L.map('map', { zoomControl: false }).setView([7.8731, 80.7718], 8); // ශ්‍රී ලංකාව මැදට
+            myMap = L.map('map', { zoomControl: false }).setView([7.8731, 80.7718], 7);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
             markerGroup.addTo(myMap);
         }
 
         window.onload = initMap;
 
+        // සිතියම යාවත්කාලීන කිරීම (Select කරන විට)
         function updateDisplay() {
             var net = document.getElementById('networkSelect').value;
-            markerGroup.clearLayers(); // පරණ Marker අයින් කරන්න
-            document.getElementById('adminPanel').style.display = 'none';
+            markerGroup.clearLayers();
 
             if (net !== "" && networkData[net].length > 0) {
                 var bounds = [];
@@ -115,19 +167,23 @@
             }
         }
 
-        function checkAdmin() {
-            if (document.getElementById('networkSelect').value === "") { 
-                alert("පළමුව Network එකක් තෝරන්න!"); 
-                return; 
-            }
+        // Admin Panel එක විවෘත කිරීම
+        function openAdmin() {
             var pw = prompt("Password එක ඇතුළත් කරන්න:");
-            if (pw === "20101027") { 
+            if (pw === "20101027") {
                 document.getElementById('adminPanel').style.display = 'block';
+            } else {
+                alert("වැරදි Password එකක්!");
             }
         }
 
+        function closeAdmin() {
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        // නව Tower එකක් ගබඩා කිරීම
         function saveTower() {
-            var net = document.getElementById('networkSelect').value;
+            var net = document.getElementById('adminNetSelect').value;
             var name = document.getElementById('towerName').value;
             var lat = parseFloat(document.getElementById('towerLat').value);
             var lng = parseFloat(document.getElementById('towerLng').value);
@@ -137,17 +193,17 @@
                 return;
             }
 
-            // ලැයිස්තුවට අලුත් කුළුණ එක් කිරීම
             networkData[net].push({ name: name, lat: lat, lng: lng });
-            localStorage.setItem('myNetworkTowers', JSON.stringify(networkData));
+            localStorage.setItem('myNetworkData', JSON.stringify(networkData));
             
-            alert("සාර්ථකව එක් කළා!");
-            updateDisplay();
+            alert(net + " සඳහා " + name + " සාර්ථකව එක් කළා!");
             
-            // Input Fields හිස් කිරීම
+            // පිරිසිදු කිරීම
             document.getElementById('towerName').value = "";
             document.getElementById('towerLat').value = "";
             document.getElementById('towerLng').value = "";
+            
+            updateDisplay();
         }
     </script>
 </body>
