@@ -115,21 +115,21 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- පොදු දත්ත (නම් රහිතව) ---
+        // --- මෙතැන සියලුම ටවර් 4 ඇතුළත් කර ඇත ---
         var publicTowers = { 
             "Mobitel": [
-                { name: "", lat: 6.665369, lng: 79.929752 },
-                { name: "", lat: 6.665151, lng: 79.939237 },
-                { name: "", lat: 6.675131, lng: 79.927113 }
+                { name: "", lat: 6.665369, lng: 79.929752 }, // Tower 1
+                { name: "", lat: 6.665151, lng: 79.939237 }, // Tower 2
+                { name: "", lat: 6.675131, lng: 79.927113 }  // Tower 4
             ], 
             "Dialog": [
-                { name: "", lat: 6.665151, lng: 79.939237 },
-                { name: "", lat: 6.661641, lng: 79.928093 },
-                { name: "", lat: 6.675131, lng: 79.927113 }
+                { name: "", lat: 6.665151, lng: 79.939237 }, // Tower 2
+                { name: "", lat: 6.661641, lng: 79.928093 }, // Tower 3
+                { name: "", lat: 6.675131, lng: 79.927113 }  // Tower 4
             ], 
             "Hutch": [
-                { name: "", lat: 6.665151, lng: 79.939237 },
-                { name: "", lat: 6.675131, lng: 79.927113 }
+                { name: "", lat: 6.665151, lng: 79.939237 }, // Tower 2
+                { name: "", lat: 6.675131, lng: 79.927113 }  // Tower 4
             ] 
         };
 
@@ -147,7 +147,6 @@
             var bounds = [];
             
             allForNet.forEach(function(tower) {
-                // නම තිබුණත් නැතත් පෙන්වන්නේ ජාලයේ නම පමණි
                 L.marker([tower.lat, tower.lng]).bindPopup("<b>" + net + " Tower</b>").addTo(markerGroup);
                 bounds.push([tower.lat, tower.lng]);
             });
