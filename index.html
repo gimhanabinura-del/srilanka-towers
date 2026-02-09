@@ -101,7 +101,7 @@
             <option value="Mobitel">Mobitel</option>
             <option value="Dialog">Dialog</option>
         </select>
-        <input type="text" id="towerName" class="admin-input" placeholder="Tower නම">
+        <input type="text" id="towerName" class="admin-input" placeholder="Tower නම (අත්‍යවශ්‍ය නැත)">
         <input type="number" id="towerLat" class="admin-input" step="any" placeholder="Latitude">
         <input type="number" id="towerLng" class="admin-input" step="any" placeholder="Longitude">
         <button class="btn-save" onclick="saveTower()">සේව් කරන්න</button>
@@ -115,22 +115,26 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // ස්ථිර දත්ත (මේවා තමයි හැමෝටම පේන්නේ)
+        // --- පොදු දත්ත (නම් රහිතව) ---
         var publicTowers = { 
             "Mobitel": [
-                { name: "Wadduwa Town Tower", lat: 6.665369, lng: 79.929752 },
-                { name: "Wadduwa Molligoda Mobitel Tower", lat: 6.684395, lng: 79.919696 }
+                { name: "", lat: 6.665369, lng: 79.929752 },
+                { name: "", lat: 6.665151, lng: 79.939237 },
+                { name: "", lat: 6.675131, lng: 79.927113 }
             ], 
-            "Dialog": [], 
+            "Dialog": [
+                { name: "", lat: 6.665151, lng: 79.939237 },
+                { name: "", lat: 6.661641, lng: 79.928093 },
+                { name: "", lat: 6.675131, lng: 79.927113 }
+            ], 
             "Hutch": [
-                { name: "Wadduwa Hutch Tower", lat: 6.68486, lng: 79.919579 }
+                { name: "", lat: 6.665151, lng: 79.939237 },
+                { name: "", lat: 6.675131, lng: 79.927113 }
             ] 
         };
 
         var localData = JSON.parse(localStorage.getItem('myTowers')) || { "Hutch": [], "Mobitel": [], "Dialog": [] };
-        
-        // ආරම්භක දසුන වාද්දුවට සෙට් කළා
-        var myMap = L.map('map', { zoomControl: false }).setView([6.67, 79.92], 13);
+        var myMap = L.map('map', { zoomControl: false }).setView([6.665, 79.935], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
@@ -143,7 +147,8 @@
             var bounds = [];
             
             allForNet.forEach(function(tower) {
-                L.marker([tower.lat, tower.lng]).bindPopup("<b>" + net + " Tower</b><br>" + tower.name).addTo(markerGroup);
+                // නම තිබුණත් නැතත් පෙන්වන්නේ ජාලයේ නම පමණි
+                L.marker([tower.lat, tower.lng]).bindPopup("<b>" + net + " Tower</b>").addTo(markerGroup);
                 bounds.push([tower.lat, tower.lng]);
             });
             
@@ -158,10 +163,10 @@
             var name = document.getElementById('towerName').value;
             var lat = parseFloat(document.getElementById('towerLat').value);
             var lng = parseFloat(document.getElementById('towerLng').value);
-            if (name && !isNaN(lat) && !isNaN(lng)) {
+            if (!isNaN(lat) && !isNaN(lng)) {
                 localData[net].push({ name: name, lat: lat, lng: lng });
                 localStorage.setItem('myTowers', JSON.stringify(localData));
-                alert("ඔබේ ෆෝන් එකට සේව් කළා. අනිත් අයට පේන්න මට දත්ත එවන්න.");
+                alert("Saved!");
                 updateDisplay();
                 closeAdmin();
             }
