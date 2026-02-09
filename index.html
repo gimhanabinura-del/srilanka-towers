@@ -1,33 +1,5 @@
 <!DOCTYPE html>
-<html lang="si">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Network Tower Map Pro</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
-        #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
-        .top-container { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 400px; }
-        .select-box { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #1a73e8; font-size: 16px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-weight: bold; }
-        .social-buttons { position: fixed; bottom: 140px; right: 20px; z-index: 1500; display: flex; flex-direction: column; gap: 10px; }
-        .social-btn { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .whatsapp { background-color: #25D366; }
-        .facebook { background-color: #1877F2; }
-        .loc-button { position: fixed; bottom: 85px; right: 20px; z-index: 1500; background: white; color: #1a73e8; border: 2px solid #1a73e8; width: 45px; height: 45px; border-radius: 50%; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .secret-admin { position: fixed; bottom: 30px; right: 20px; z-index: 1500; background: #1a73e8; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 28px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        #adminPanel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 85%; max-width: 320px; }
-        .admin-input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .btn-save { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
-    </style>
-</head>
-<body>
 
-    <div class="top-container">
-        <select id="networkSelect" class="select-box" onchange="updateDisplay()">
-            <option value="">ජාලය තෝරන්න (Select Network)</option>
-            <option value="Hutch">Hutch</option>
-            <option value="Mobitel">Mobitel</option>
             <option value="Dialog">Dialog</option>
         </select>
     </div>
