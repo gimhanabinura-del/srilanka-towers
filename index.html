@@ -44,7 +44,6 @@
             <option value="Mobitel">Mobitel</option>
             <option value="Dialog">Dialog</option>
         </select>
-        <input type="text" id="towerName" class="admin-input" placeholder="Tower නම (අත්‍යවශ්‍ය නැත)">
         <input type="number" id="towerLat" class="admin-input" step="any" placeholder="Latitude">
         <input type="number" id="towerLng" class="admin-input" step="any" placeholder="Longitude">
         <button class="btn-save" onclick="saveTower()">සේව් කරන්න</button>
@@ -60,26 +59,29 @@
     <script>
         var publicTowers = { 
             "Mobitel": [
-                { name: "", lat: 6.665369, lng: 79.929752 }, { name: "", lat: 6.665151, lng: 79.939237 }, 
-                { name: "", lat: 6.675131, lng: 79.927113 }, { name: "", lat: 6.684259, lng: 79.919874 },
-                { name: "", lat: 6.713812, lng: 79.907549 }, { name: "", lat: 6.710636, lng: 79.909850 },
-                { name: "", lat: 6.653197, lng: 79.940395 },
-                { name: "", lat: 6.682647, lng: 79.941428 } 
+                { lat: 6.665369, lng: 79.929752 }, { lat: 6.665151, lng: 79.939237 }, 
+                { lat: 6.675131, lng: 79.927113 }, { lat: 6.684259, lng: 79.919874 },
+                { lat: 6.713812, lng: 79.907549 }, { lat: 6.710636, lng: 79.909850 },
+                { lat: 6.653197, lng: 79.940395 }, { lat: 6.682647, lng: 79.941428 },
+                { lat: 6.561321, lng: 79.969582 }
             ], 
             "Dialog": [
-                { name: "", lat: 6.665151, lng: 79.939237 }, { name: "", lat: 6.661641, lng: 79.928093 }, 
-                { name: "", lat: 6.675131, lng: 79.927113 }, { name: "", lat: 6.713812, lng: 79.907549 },
-                { name: "", lat: 6.653197, lng: 79.940395 }
+                { lat: 6.665151, lng: 79.939237 }, { lat: 6.661641, lng: 79.928093 }, 
+                { lat: 6.675131, lng: 79.927113 }, { lat: 6.713812, lng: 79.907549 },
+                { lat: 6.653197, lng: 79.940395 }, { lat: 6.564283, lng: 79.984304 },
+                { lat: 6.561321, lng: 79.969582 },
+                { lat: 6.585204, lng: 79.960552 } // අලුතින් එකතු කළ Dialog Tower
             ], 
             "Hutch": [
-                { name: "", lat: 6.665151, lng: 79.939237 }, { name: "", lat: 6.675131, lng: 79.927113 },
-                { name: "", lat: 6.684259, lng: 79.919874 }, { name: "", lat: 6.712213, lng: 79.906997 },
-                { name: "", lat: 6.653197, lng: 79.940395 }
+                { lat: 6.665151, lng: 79.939237 }, { lat: 6.675131, lng: 79.927113 },
+                { lat: 6.684259, lng: 79.919874 }, { lat: 6.712213, lng: 79.906997 },
+                { lat: 6.653197, lng: 79.940395 }, { lat: 6.564283, lng: 79.984304 },
+                { lat: 6.561321, lng: 79.969582 }
             ] 
         };
 
         var localData = JSON.parse(localStorage.getItem('myTowers')) || { "Hutch": [], "Mobitel": [], "Dialog": [] };
-        var myMap = L.map('map', { zoomControl: false }).setView([6.68, 79.92], 12);
+        var myMap = L.map('map', { zoomControl: false }).setView([6.58, 79.96], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
@@ -103,9 +105,9 @@
             var lat = parseFloat(document.getElementById('towerLat').value);
             var lng = parseFloat(document.getElementById('towerLng').value);
             if (!isNaN(lat) && !isNaN(lng)) {
-                localData[net].push({ name: "", lat: lat, lng: lng });
+                localData[net].push({ lat: lat, lng: lng });
                 localStorage.setItem('myTowers', JSON.stringify(localData));
-                alert("Saved Locally!");
+                alert("Saved!");
                 updateDisplay();
                 closeAdmin();
             }
