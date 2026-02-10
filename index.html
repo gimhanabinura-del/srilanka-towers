@@ -63,25 +63,28 @@
                 { lat: 6.675131, lng: 79.927113 }, { lat: 6.684259, lng: 79.919874 },
                 { lat: 6.713812, lng: 79.907549 }, { lat: 6.710636, lng: 79.909850 },
                 { lat: 6.653197, lng: 79.940395 }, { lat: 6.682647, lng: 79.941428 },
-                { lat: 6.561321, lng: 79.969582 }
+                { lat: 6.561321, lng: 79.969582 }, { lat: 6.523607, lng: 80.115234 }
             ], 
             "Dialog": [
                 { lat: 6.665151, lng: 79.939237 }, { lat: 6.661641, lng: 79.928093 }, 
                 { lat: 6.675131, lng: 79.927113 }, { lat: 6.713812, lng: 79.907549 },
                 { lat: 6.653197, lng: 79.940395 }, { lat: 6.564283, lng: 79.984304 },
-                { lat: 6.561321, lng: 79.969582 },
-                { lat: 6.585204, lng: 79.960552 } // අලුතින් එකතු කළ Dialog Tower
+                { lat: 6.561321, lng: 79.969582 }, { lat: 6.585204, lng: 79.960552 },
+                { lat: 6.726457, lng: 79.900981 }, { lat: 6.523607, lng: 80.115234 },
+                { lat: 6.480516, lng: 80.122775 } // අලුත් Dialog Tower
             ], 
             "Hutch": [
                 { lat: 6.665151, lng: 79.939237 }, { lat: 6.675131, lng: 79.927113 },
                 { lat: 6.684259, lng: 79.919874 }, { lat: 6.712213, lng: 79.906997 },
                 { lat: 6.653197, lng: 79.940395 }, { lat: 6.564283, lng: 79.984304 },
-                { lat: 6.561321, lng: 79.969582 }
+                { lat: 6.561321, lng: 79.969582 }, { lat: 6.726457, lng: 79.900981 },
+                { lat: 6.523607, lng: 80.115234 },
+                { lat: 6.480516, lng: 80.122775 } // අලුත් Hutch Tower
             ] 
         };
 
         var localData = JSON.parse(localStorage.getItem('myTowers')) || { "Hutch": [], "Mobitel": [], "Dialog": [] };
-        var myMap = L.map('map', { zoomControl: false }).setView([6.58, 79.96], 12);
+        var myMap = L.map('map', { zoomControl: false }).setView([6.48, 80.12], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
