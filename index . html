@@ -8,22 +8,14 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
         #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
-        
-        /* ඉහළ තීරුව */
         .top-container { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 400px; }
         .select-box { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #1a73e8; font-size: 16px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-weight: bold; }
-        
-        /* සමාජ මාධ්‍ය බොත්තම් */
         .social-buttons { position: fixed; bottom: 140px; right: 20px; z-index: 1500; display: flex; flex-direction: column; gap: 10px; }
         .social-btn { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .whatsapp { background-color: #25D366; }
         .facebook { background-color: #1877F2; }
-        
-        /* ස්ථාන බොත්තම සහ Admin බොත්තම */
         .loc-button { position: fixed; bottom: 85px; right: 20px; z-index: 1500; background: white; color: #1a73e8; border: 2px solid #1a73e8; width: 45px; height: 45px; border-radius: 50%; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .secret-admin { position: fixed; bottom: 30px; right: 20px; z-index: 1500; background: #1a73e8; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 28px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        
-        /* Admin පැනලය */
         #adminPanel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 85%; max-width: 320px; }
         .admin-input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         .btn-save { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
@@ -66,84 +58,62 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // පවතින දත්ත
         var publicTowers = { 
             "Mobitel": [
-                { name: "Mobitel Tower", lat: 6.665369, lng: 79.929752 },
-                { name: "Mobitel Tower", lat: 6.665151, lng: 79.939237 },
-                { name: "Mobitel Tower", lat: 6.675131, lng: 79.927113 },
-                { name: "Mobitel Tower", lat: 6.684259, lng: 79.919874 }
+                { name: "", lat: 6.665369, lng: 79.929752 }, { name: "", lat: 6.665151, lng: 79.939237 }, 
+                { name: "", lat: 6.675131, lng: 79.927113 }, { name: "", lat: 6.684259, lng: 79.919874 },
+                { name: "", lat: 6.713812, lng: 79.907549 }, { name: "", lat: 6.710636, lng: 79.909850 },
+                { name: "", lat: 6.653197, lng: 79.940395 },
+                { name: "", lat: 6.682647, lng: 79.941428 } 
             ], 
             "Dialog": [
-                { name: "Dialog Tower", lat: 6.665151, lng: 79.939237 },
-                { name: "Dialog Tower", lat: 6.661641, lng: 79.928093 }
+                { name: "", lat: 6.665151, lng: 79.939237 }, { name: "", lat: 6.661641, lng: 79.928093 }, 
+                { name: "", lat: 6.675131, lng: 79.927113 }, { name: "", lat: 6.713812, lng: 79.907549 },
+                { name: { name: "", lat: 6.653197, lng: 79.940395 }
             ], 
             "Hutch": [
-                { name: "Hutch Tower", lat: 6.665151, lng: 79.939237 },
-                { name: "Hutch Tower", lat: 6.675131, lng: 79.927113 }
+                { name: "", lat: 6.665151, lng: 79.939237 }, { name: "", lat: 6.675131, lng: 79.927113 },
+                { name: "", lat: 6.684259, lng: 79.919874 }, { name: "", lat: 6.712213, lng: 79.906997 },
+                { name: "", lat: 6.653197, lng: 79.940395 }
             ] 
         };
 
-        // Local storage එකෙන් දත්ත ලබා ගැනීම
         var localData = JSON.parse(localStorage.getItem('myTowers')) || { "Hutch": [], "Mobitel": [], "Dialog": [] };
-        
-        // සිතියම ආරම්භ කිරීම
         var myMap = L.map('map', { zoomControl: false }).setView([6.68, 79.92], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
-        // සිතියම යාවත්කාලීන කිරීම
         function updateDisplay() {
             var net = document.getElementById('networkSelect').value;
             markerGroup.clearLayers();
             if (!net) return;
-            
             var allForNet = publicTowers[net].concat(localData[net]);
             var bounds = [];
-            
             allForNet.forEach(function(tower) {
-                L.marker([tower.lat, tower.lng]).bindPopup("<b>" + net + " Tower</b><br>" + (tower.name || "")).addTo(markerGroup);
+                L.marker([tower.lat, tower.lng]).bindPopup("<b>" + net + " Tower</b>").addTo(markerGroup);
                 bounds.push([tower.lat, tower.lng]);
             });
-            
             if(bounds.length > 0) myMap.fitBounds(bounds, { padding: [50, 50] });
         }
 
-        // Admin panel එක විවෘත කිරීම
-        function openAdmin() { 
-            var pw = prompt("Password:");
-            if (pw === "20101027") {
-                document.getElementById('adminPanel').style.display = 'block'; 
-            } else {
-                alert("වැරදි මුරපදයක්!");
-            }
-        }
-        
+        function openAdmin() { if (prompt("Password:") === "20101027") document.getElementById('adminPanel').style.display = 'block'; }
         function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
-
-        // නව Tower එකක් සුරැකීම
         function saveTower() {
             var net = document.getElementById('adminNetSelect').value;
-            var name = document.getElementById('towerName').value;
             var lat = parseFloat(document.getElementById('towerLat').value);
             var lng = parseFloat(document.getElementById('towerLng').value);
-            
             if (!isNaN(lat) && !isNaN(lng)) {
-                localData[net].push({ name: name, lat: lat, lng: lng });
+                localData[net].push({ name: "", lat: lat, lng: lng });
                 localStorage.setItem('myTowers', JSON.stringify(localData));
-                alert("සුරැකුණා!");
+                alert("Saved!");
                 updateDisplay();
                 closeAdmin();
-            } else {
-                alert("කරුණාකර නිවැරදි Lat/Lng ඇතුළත් කරන්න.");
             }
         }
-
-        // මගේ ස්ථානය සෙවීම
         function findMyLocation() {
             myMap.locate({setView: true, maxZoom: 14});
             myMap.on('locationfound', function(e) {
-                L.circleMarker(e.latlng, {radius: 8, color: '#1a73e8', fillOpacity: 0.8}).addTo(myMap).bindPopup("ඔබ මෙතැනයි").openPopup();
+                L.circleMarker(e.latlng, {radius: 8, color: '#1a73e8'}).addTo(myMap).bindPopup("ඔබ මෙතැනයි").openPopup();
             });
         }
     </script>
