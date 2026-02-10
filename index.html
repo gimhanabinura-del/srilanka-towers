@@ -62,4 +62,60 @@
         var publicTowers = { 
             "Mobitel": [
                 { name: "", lat: 6.665369, lng: 79.929752 }, { name: "", lat: 6.665151, lng: 79.939237 }, 
-                { name: "", lat: 6.675131, lng: 7
+                { name: "", lat: 6.675131, lng: 79.927113 }, { name: "", lat: 6.684259, lng: 79.919874 },
+                { name: "", lat: 6.713812, lng: 79.907549 }, { name: "", lat: 6.710636, lng: 79.909850 },
+                { name: "", lat: 6.653197, lng: 79.940395 }, { name: "", lat: 6.682647, lng: 79.941428 } 
+            ], 
+            "Dialog": [
+                { name: "", lat: 6.665151, lng: 79.939237 }, { name: "", lat: 6.661641, lng: 79.928093 }, 
+                { name: "", lat: 6.675131, lng: 79.927113 }, { name: "", lat: 6.713812, lng: 79.907549 },
+                { name: "", lat: 6.653197, lng: 79.940395 }
+            ], 
+            "Hutch": [
+                { name: "", lat: 6.665151, lng: 79.939237 }, { name: "", lat: 6.675131, lng: 79.927113 },
+                { name: "", lat: 6.684259, lng: 79.919874 }, { name: "", lat: 6.712213, lng: 79.906997 },
+                { name: "", lat: 6.653197, lng: 79.940395 }
+            ] 
+        };
+
+        var localData = JSON.parse(localStorage.getItem('myTowers')) || { "Hutch": [], "Mobitel": [], "Dialog": [] };
+        var myMap = L.map('map', { zoomControl: false }).setView([6.68, 79.92], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
+        var markerGroup = L.layerGroup().addTo(myMap);
+
+        function updateDisplay() {
+            var net = document.getElementById('networkSelect').value;
+            markerGroup.clearLayers();
+            if (!net) return;
+            var allForNet = publicTowers[net].concat(localData[net]);
+            var bounds = [];
+            allForNet.forEach(function(tower) {
+                L.marker([tower.lat, tower.lng]).bindPopup("<b>" + net + " Tower</b>").addTo(markerGroup);
+                bounds.push([tower.lat, tower.lng]);
+            });
+            if(bounds.length > 0) myMap.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        function openAdmin() { if (prompt("Password:") === "20101027") document.getElementById('adminPanel').style.display = 'block'; }
+        function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
+        function saveTower() {
+            var net = document.getElementById('adminNetSelect').value;
+            var lat = parseFloat(document.getElementById('towerLat').value);
+            var lng = parseFloat(document.getElementById('towerLng').value);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                localData[net].push({ name: "", lat: lat, lng: lng });
+                localStorage.setItem('myTowers', JSON.stringify(localData));
+                alert("Saved Locally!");
+                updateDisplay();
+                closeAdmin();
+            }
+        }
+        function findMyLocation() {
+            myMap.locate({setView: true, maxZoom: 14});
+            myMap.on('locationfound', function(e) {
+                L.circleMarker(e.latlng, {radius: 8, color: '#1a73e8'}).addTo(myMap).bindPopup("ඔබ මෙතැනයි").openPopup();
+            });
+        }
+    </script>
+</body>
+</html>
