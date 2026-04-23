@@ -11,7 +11,11 @@
         
         /* Business Header */
         .top-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 95%; max-width: 450px; text-align: center; }
-        .biz-header { background: #1a73e8; color: white; padding: 12px; border-radius: 10px 10px 0 0; font-size: 18px; font-weight: bold; letter-spacing: 1px; }
+        .biz-header { 
+            background: #1a73e8; color: white; padding: 12px; border-radius: 10px 10px 0 0; 
+            font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .biz-logo { height: 30px; width: auto; border-radius: 4px; }
         .select-box { width: 100%; padding: 12px; border-radius: 0 0 10px 10px; border: 2px solid #1a73e8; font-size: 16px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-weight: bold; }
 
         /* Floating Buttons */
@@ -24,7 +28,7 @@
 
         /* Popup Content Styles */
         .popup-card { text-align: center; width: 180px; }
-        .router-img { width: 100%; border-radius: 8px; margin: 8px 0; border: 1px solid #eee; }
+        .popup-logo { width: 60px; margin-bottom: 5px; border-radius: 5px; }
         .buy-now-btn { background: #25D366; color: white !important; padding: 8px 15px; text-decoration: none; display: block; border-radius: 5px; font-weight: bold; margin-top: 8px; font-size: 14px; }
         
         /* Secret Admin */
@@ -36,7 +40,10 @@
 <body>
 
     <div class="top-container">
-        <div class="biz-header">ROUTER HOME</div>
+        <div class="biz-header">
+            <img src="https://i.ibb.co/cXrHqXsF/logo.png" class="biz-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3659/3659899.png'">
+            ROUTER HOME
+        </div>
         <select id="networkSelect" class="select-box" onchange="updateDisplay()">
             <option value="">ජාලය තෝරන්න (Select Network)</option>
             <option value="Hutch">Hutch 4G/5G</option>
@@ -46,7 +53,7 @@
     </div>
 
     <div class="social-buttons">
-        <a href="https://wa.me/94765825288?text=I%20want%20to%20buy%20a%20router%20from%20Router%20Home" target="_blank" class="social-btn whatsapp">💬</a>
+        <a href="https://wa.me/94765825288" target="_blank" class="social-btn whatsapp">💬</a>
         <a href="https://www.facebook.com/share/1CMKzHNNiM/" target="_blank" class="social-btn facebook">f</a>
     </div>
 
@@ -70,8 +77,8 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Placeholder Router Image (ඔබේ පින්තූරයේ ලින්ක් එක මෙතැනට දාන්න)
-        var routerImgUrl = "https://cdn-icons-png.flaticon.com/512/3659/3659899.png"; 
+        // ඔබේ ලෝගෝ එකේ Direct Link එක
+        var myLogoUrl = "https://i.ibb.co/cXrHqXsF/logo.png"; 
 
         var publicTowers = { 
             "Mobitel": [
@@ -114,10 +121,10 @@
             allForNet.forEach(function(tower) {
                 var popupContent = `
                     <div class="popup-card">
-                        <strong style="color:#1a73e8;">${net} Tower</strong><br>
-                        <img src="${routerImgUrl}" class="router-img">
-                        <div style="font-size:12px; margin-bottom:5px;">අධිවේගී 4G/5G රවුටර් ලබාගන්න.</div>
-                        <a href="https://wa.me/94765825288?text=මම ROUTER HOME මැප් එකෙන් ${net} ටවර් එක බැලුවා. මට රවුටරයක් ගන්න ඕනේ." 
+                        <img src="${myLogoUrl}" class="popup-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3659/3659899.png'">
+                        <br><strong style="color:#1a73e8;">${net} Tower</strong><br>
+                        <div style="font-size:12px; margin:5px 0;">හොඳම සිග්නල් මෙතැනට තිබේ.</div>
+                        <a href="https://wa.me/94765825288?text=I%20saw%20${net}%20tower%20on%20Router%20Home%20map" 
                            target="_blank" class="buy-now-btn">මිලදී ගන්න</a>
                     </div>
                 `;
