@@ -32,8 +32,8 @@
         </div>
         <select id="networkSelect" class="select-box" onchange="updateDisplay()">
             <option value="">ජාලය තෝරන්න</option>
-            <option value="Dialog">Dialog (5G)</option>
-            <option value="Mobitel">Mobitel (4G)</option>
+            <option value="Dialog and airtel">Dialog and airtel (4g,5G)</option>
+            <option value="Mobitel">Mobitel (5g,4G)</option>
             <option value="Hutch">Hutch (4G)</option>
         </select>
     </div>
@@ -85,7 +85,7 @@
                 allTowers.forEach(function(t) {
                     if (t.net === selectedNet) {
                         var waMsg = encodeURIComponent("මට " + t.net + " " + t.type + " Router එකක් මිලදී ගැනීමට අවශ්‍යයි.");
-                        var popupHTML = `<div style="text-align:center;"><b>${t.net} ${t.type}</b><br><a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">මිලදී ගන්න</a></div>`;
+                        var popupHTML = `<div style="text-align:center;"><b>${t.net} ${t.type}</b><br><a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">Router මිලදී ගන්න</a></div>`;
                         
                         L.marker([t.lat, t.lng], {icon: t.icon}).addTo(markerGroup).bindPopup(popupHTML);
                         bounds.push([t.lat, t.lng]);
