@@ -1,28 +1,75 @@
+
 <!DOCTYPE html>
 <html lang="si">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>ROUTER HOME - 5G/4G Map</title>
+    <title>ROUTER HOME - Dialog 5G Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
         #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
-        .top-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 95%; max-width: 500px; text-align: center; }
-        .biz-header { background: #1a73e8; color: white; padding: 12px; border-radius: 12px 12px 0 0; font-size: 20px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .select-box { width: 100%; padding: 12px; border-radius: 0 0 12px 12px; border: 3px solid #1a73e8; font-size: 16px; background: white; font-weight: bold; cursor: pointer; }
-        .buy-now-btn { background: #25D366; color: white !important; padding: 10px; text-decoration: none; display: block; border-radius: 5px; font-weight: bold; margin-top: 8px; text-align: center; }
+        
+        /* Header styling */
+        .top-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 92%; max-width: 450px; }
+        
+        .biz-header { 
+            background: #1a73e8; 
+            color: white; 
+            padding: 12px; 
+            border-radius: 15px 15px 0 0; 
+            font-size: 20px; 
+            font-weight: 800; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .biz-logo { 
+            height: 45px; 
+            width: 45px; 
+            border-radius: 8px; 
+            border: 2px solid white; 
+            background: white;
+        }
+
+        .select-box { 
+            width: 100%; 
+            padding: 15px; 
+            border-radius: 0 0 15px 15px; 
+            border: 4px solid #1a73e8; 
+            font-size: 17px; 
+            background: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+            color: #333;
+        }
+
+        .buy-now-btn { 
+            background: #25D366; 
+            color: white !important; 
+            padding: 10px; 
+            text-decoration: none; 
+            display: block; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            margin-top: 8px; 
+            text-align: center; 
+        }
     </style>
 </head>
 <body>
 
     <div class="top-container">
-        <div class="biz-header">ROUTER HOME</div>
-        <select id="networkSelect" class="select-box" onchange="updateDisplay()">
+        <div class="biz-header">
+            <img src="https://i.ibb.co/cXrHqXsF/logo.png" class="biz-logo" alt="Logo">
+            ROUTER HOME
+        </div>
+        <select id="networkSelect" class="select-box" onchange="showTower()">
             <option value="">ජාලය තෝරන්න (Select Network)</option>
             <option value="Dialog">Dialog 5G</option>
-            <option value="Mobitel">Mobitel 4G</option>
-            <option value="Hutch">Hutch 4G</option>
         </select>
     </div>
 
@@ -30,31 +77,36 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        var redIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
+        // 5G සඳහා රතු පාට මාකර් එක
+        var redIcon = new L.Icon({ 
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', 
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', 
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] 
+        });
 
+        // සිතියම load වන විට ඔබ ලබාදුන් ස්ථානයට (Center) සැකසීම
         var myMap = L.map('map', { zoomControl: false }).setView([6.706035, 79.909137], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
-        var publicTowers = { 
-            "Dialog": [{ lat: 6.706035, lng: 79.909137, type: "5G" }],
-            "Mobitel": [{ lat: 6.709786, lng: 79.922136, type: "4G" }],
-            "Hutch": [{ lat: 6.700144, lng: 79.912565, type: "4G" }] 
-        };
+        // Dialog 5G ටවර් එකේ දත්ත පමණි
+        var tower = { lat: 6.706035, lng: 79.909137, type: "5G" };
 
-        function updateDisplay() {
-            var net = document.getElementById('networkSelect').value;
+        function showTower() {
+            var val = document.getElementById('networkSelect').value;
             markerGroup.clearLayers(); 
-            
-            if (net && publicTowers[net]) {
-                publicTowers[net].forEach(function(tower) {
-                    var waMsg = encodeURIComponent("මට " + net + " Router එකක් අවශ්‍යයි.");
-                    var popupContent = `<div style="text-align:center;"><strong>${net}</strong><br><a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">Router මිලදී ගන්න</a></div>`;
-                    
-                    var marker = L.marker([tower.lat, tower.lng], {icon: redIcon}).addTo(markerGroup);
-                    marker.bindPopup(popupContent).openPopup();
-                    myMap.flyTo([tower.lat, tower.lng], 16); 
-                });
+
+            if (val === "Dialog") {
+                var waMsg = encodeURIComponent("මට Dialog 5G Router එකක් මිලදී ගැනීමට අවශ්‍යයි.");
+                var popupHTML = `
+                    <div style="text-align:center;">
+                        <b>Dialog 5G</b><br>
+                        <a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">Router මිලදී ගන්න</a>
+                    </div>`;
+                
+                var m = L.marker([tower.lat, tower.lng], {icon: redIcon}).addTo(markerGroup);
+                m.bindPopup(popupHTML).openPopup();
+                myMap.flyTo([tower.lat, tower.lng], 17);
             }
         }
     </script>
