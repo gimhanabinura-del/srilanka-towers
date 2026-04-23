@@ -1,15 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="si">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>ROUTER HOME - 5G/4G Legend Map</title>
+    <title>ROUTER HOME - 5G/4G Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
         #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
         
-        /* Header */
         .top-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 95%; max-width: 500px; text-align: center; }
         .biz-header { 
             background: #1a73e8; color: white; padding: 12px; border-radius: 12px 12px 0 0; 
@@ -17,7 +17,6 @@
         }
         .biz-logo { height: 40px; width: auto; border-radius: 6px; border: 2px solid white; }
         
-        /* Legend - ටවර් වර්ග පෙන්වන කොටස */
         .tower-legend {
             background: white; padding: 8px; border-bottom: 2px solid #ddd;
             display: flex; justify-content: center; gap: 20px; font-size: 14px; font-weight: bold;
@@ -27,17 +26,15 @@
         .red-dot { background-color: #ff0000; box-shadow: 0 0 5px red; }
         .blue-dot { background-color: #1a73e8; box-shadow: 0 0 5px blue; }
 
-        .select-box { width: 100%; padding: 12px; border-radius: 0 0 12px 12px; border: 3px solid #1a73e8; font-size: 16px; background: white; font-weight: bold; }
+        .select-box { width: 100%; padding: 12px; border-radius: 0 0 12px 12px; border: 3px solid #1a73e8; font-size: 16px; background: white; font-weight: bold; cursor: pointer; }
 
-        /* Popup */
         .popup-card { text-align: center; width: 180px; }
         .popup-logo { width: 90px; margin-bottom: 5px; border-radius: 5px; }
         .buy-now-btn { background: #25D366; color: white !important; padding: 8px; text-decoration: none; display: block; border-radius: 5px; font-weight: bold; margin-top: 8px; }
         
-        /* Admin */
-        .secret-admin { position: fixed; bottom: 20px; right: 20px; z-index: 1500; background: #333; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; opacity: 0.2; }
+        .secret-admin { position: fixed; bottom: 20px; right: 20px; z-index: 1500; background: #333; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; opacity: 0.2; cursor: pointer; }
         #adminPanel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; background: white; padding: 20px; border-radius: 15px; width: 85%; max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .admin-input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
+        .admin-input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -55,9 +52,9 @@
 
         <select id="networkSelect" class="select-box" onchange="updateDisplay()">
             <option value="">ජාලය තෝරන්න (Select Network)</option>
-            <option value="Hutch">Hutch 4G/5G</option>
-            <option value="Mobitel">Mobitel 4G/5G</option>
             <option value="Dialog">Dialog 4G/5G</option>
+            <option value="Mobitel">Mobitel 4G/5G</option>
+            <option value="Hutch">Hutch 4G/5G</option>
         </select>
     </div>
 
@@ -66,9 +63,9 @@
     <div id="adminPanel">
         <h3 style="margin:0; text-align:center;">Tower එකතු කරන්න</h3>
         <select id="adminNetSelect" class="admin-input">
-            <option value="Hutch">Hutch</option>
-            <option value="Mobitel">Mobitel</option>
             <option value="Dialog">Dialog</option>
+            <option value="Mobitel">Mobitel</option>
+            <option value="Hutch">Hutch</option>
         </select>
         <select id="towerType" class="admin-input">
             <option value="4G">4G Tower</option>
@@ -76,8 +73,8 @@
         </select>
         <input type="number" id="towerLat" class="admin-input" step="any" placeholder="Latitude">
         <input type="number" id="towerLng" class="admin-input" step="any" placeholder="Longitude">
-        <button style="width:100%; padding:12px; background:#1a73e8; color:white; border:none; border-radius:5px; font-weight:bold;" onclick="saveTower()">සේව් කරන්න</button>
-        <button onclick="closeAdmin()" style="width:100%; border:none; background:none; margin-top:10px; color:#666;">වහන්න</button>
+        <button style="width:100%; padding:12px; background:#1a73e8; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;" onclick="saveTower()">සේව් කරන්න</button>
+        <button onclick="closeAdmin()" style="width:100%; border:none; background:none; margin-top:10px; color:#666; cursor:pointer;">වහන්න</button>
     </div>
 
     <button class="secret-admin" onclick="openAdmin()">⚙️</button>
@@ -98,14 +95,27 @@
             iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
         });
 
+        // ස්ථිර දත්ත (Static Data)
         var publicTowers = { 
-            "Mobitel": [{ lat: 6.665369, lng: 79.929752, type: "5G" }], 
-            "Dialog": [{ lat: 6.665151, lng: 79.939237, type: "5G" }], 
-            "Hutch": [{ lat: 6.665151, lng: 79.939237, type: "4G" }] 
+            "Dialog": [
+                { lat: 6.665151, lng: 79.939237, type: "5G" },
+                { lat: 6.661753, lng: 79.971831, type: "5G" },
+                { lat: 6.666295, lng: 79.940239, type: "5G" }
+            ],
+            "Mobitel": [
+                { lat: 6.665369, lng: 79.929752, type: "5G" },
+                { lat: 6.666295, lng: 79.940239, type: "4G" }
+            ],
+            "Hutch": [
+                { lat: 6.665151, lng: 79.939237, type: "4G" },
+                { lat: 6.666295, lng: 79.940239, type: "4G" }
+            ] 
         };
 
         var localData = JSON.parse(localStorage.getItem('myTowers')) || { "Hutch": [], "Mobitel": [], "Dialog": [] };
-        var myMap = L.map('map', { zoomControl: false }).setView([6.6, 79.9], 11);
+        
+        // සිතියම මුලින්ම පෙන්වන ස්ථානය (Center)
+        var myMap = L.map('map', { zoomControl: false }).setView([6.666295, 79.940239], 14);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
@@ -132,10 +142,19 @@
                 L.marker([tower.lat, tower.lng], {icon: towerIcon}).bindPopup(popupContent).addTo(markerGroup);
                 bounds.push([tower.lat, tower.lng]);
             });
-            if(bounds.length > 0) myMap.fitBounds(bounds, { padding: [60, 60] });
+
+            if(bounds.length > 0) {
+                myMap.fitBounds(bounds, { padding: [60, 60], maxZoom: 16 });
+            }
         }
 
-        function openAdmin() { if (prompt("Password:") === "20101027") document.getElementById('adminPanel').style.display = 'block'; }
+        function openAdmin() { 
+            var pw = prompt("Password:");
+            if (pw === "20101027") {
+                document.getElementById('adminPanel').style.display = 'block';
+            }
+        }
+
         function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
         
         function saveTower() {
@@ -143,12 +162,18 @@
             var type = document.getElementById('towerType').value;
             var lat = parseFloat(document.getElementById('towerLat').value);
             var lng = parseFloat(document.getElementById('towerLng').value);
+            
             if (!isNaN(lat) && !isNaN(lng)) {
+                if(!localData[net]) localData[net] = [];
                 localData[net].push({ lat: lat, lng: lng, type: type });
                 localStorage.setItem('myTowers', JSON.stringify(localData));
                 alert(type + " Tower එකතු වුණා!");
                 updateDisplay();
                 closeAdmin();
+            } else {
+                alert("කරුණාකර නිවැරදි Latitude සහ Longitude ඇතුළත් කරන්න.");
             }
         }
     </script>
+</body>
+</html>
