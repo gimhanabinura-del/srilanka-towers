@@ -9,32 +9,37 @@
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
         #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
         
-        /* Business Header */
-        .top-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 95%; max-width: 450px; text-align: center; }
+        /* Business Header - මෙහි ප්‍රමාණයන් විශාල කර ඇත */
+        .top-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 95%; max-width: 500px; text-align: center; }
         .biz-header { 
-            background: #1a73e8; color: white; padding: 12px; border-radius: 10px 10px 0 0; 
-            font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: #1a73e8; color: white; padding: 15px; border-radius: 12px 12px 0 0; 
+            font-size: 22px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 15px;
+            text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .biz-logo { height: 30px; width: auto; border-radius: 4px; }
-        .select-box { width: 100%; padding: 12px; border-radius: 0 0 10px 10px; border: 2px solid #1a73e8; font-size: 16px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-weight: bold; }
+        .biz-logo { height: 45px; width: auto; border-radius: 6px; border: 2px solid white; }
+        
+        .select-box { 
+            width: 100%; padding: 15px; border-radius: 0 0 12px 12px; border: 3px solid #1a73e8; 
+            font-size: 18px; background: white; box-shadow: 0 6px 20px rgba(0,0,0,0.3); font-weight: bold; color: #333;
+        }
 
         /* Floating Buttons */
-        .social-buttons { position: fixed; bottom: 140px; right: 20px; z-index: 1500; display: flex; flex-direction: column; gap: 10px; }
-        .social-btn { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .social-buttons { position: fixed; bottom: 140px; right: 20px; z-index: 1500; display: flex; flex-direction: column; gap: 12px; }
+        .social-btn { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         .whatsapp { background-color: #25D366; }
         .facebook { background-color: #1877F2; }
 
-        .loc-button { position: fixed; bottom: 85px; right: 20px; z-index: 1500; background: white; color: #1a73e8; border: 2px solid #1a73e8; width: 50px; height: 50px; border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .loc-button { position: fixed; bottom: 80px; right: 20px; z-index: 1500; background: white; color: #1a73e8; border: 2px solid #1a73e8; width: 55px; height: 55px; border-radius: 50%; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
 
-        /* Popup Content Styles */
-        .popup-card { text-align: center; width: 180px; }
-        .popup-logo { width: 60px; margin-bottom: 5px; border-radius: 5px; }
-        .buy-now-btn { background: #25D366; color: white !important; padding: 8px 15px; text-decoration: none; display: block; border-radius: 5px; font-weight: bold; margin-top: 8px; font-size: 14px; }
+        /* Popup Content Styles - මෙහි ලෝගෝ එක ලොකු කර ඇත */
+        .popup-card { text-align: center; width: 200px; padding: 5px; }
+        .popup-logo { width: 100px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #ddd; }
+        .buy-now-btn { background: #25D366; color: white !important; padding: 10px 15px; text-decoration: none; display: block; border-radius: 8px; font-weight: bold; margin-top: 10px; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
         /* Secret Admin */
-        .secret-admin { position: fixed; bottom: 30px; right: 20px; z-index: 1500; background: #333; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 15px; cursor: pointer; opacity: 0.3; }
-        #adminPanel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 85%; max-width: 320px; }
-        .admin-input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .secret-admin { position: fixed; bottom: 25px; right: 20px; z-index: 1500; background: #333; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; font-size: 18px; cursor: pointer; opacity: 0.2; }
+        #adminPanel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); width: 85%; max-width: 350px; }
+        .admin-input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -58,7 +63,7 @@
     </div>
 
     <div id="adminPanel">
-        <h3 style="margin:0; color:#1a73e8; text-align:center;">Tower එකතු කරන්න</h3>
+        <h3 style="margin:0; color:#1a73e8; text-align:center; font-size: 20px;">Tower එකතු කරන්න</h3>
         <select id="adminNetSelect" class="admin-input">
             <option value="Hutch">Hutch</option>
             <option value="Mobitel">Mobitel</option>
@@ -66,8 +71,8 @@
         </select>
         <input type="number" id="towerLat" class="admin-input" step="any" placeholder="Latitude">
         <input type="number" id="towerLng" class="admin-input" step="any" placeholder="Longitude">
-        <button style="width:100%; padding:12px; background:#1a73e8; color:white; border:none; border-radius:5px; cursor:pointer;" onclick="saveTower()">සේව් කරන්න</button>
-        <button onclick="closeAdmin()" style="width:100%; border:none; background:none; margin-top:10px; color:#666; cursor:pointer;">වහන්න</button>
+        <button style="width:100%; padding:14px; background:#1a73e8; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:16px;" onclick="saveTower()">සේව් කරන්න</button>
+        <button onclick="closeAdmin()" style="width:100%; border:none; background:none; margin-top:12px; color:#666; cursor:pointer; font-weight:500;">පසුපසට</button>
     </div>
 
     <div id="map"></div>
@@ -77,7 +82,6 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // ඔබේ ලෝගෝ එකේ Direct Link එක
         var myLogoUrl = "https://i.ibb.co/cXrHqXsF/logo.png"; 
 
         var publicTowers = { 
@@ -122,20 +126,21 @@
                 var popupContent = `
                     <div class="popup-card">
                         <img src="${myLogoUrl}" class="popup-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3659/3659899.png'">
-                        <br><strong style="color:#1a73e8;">${net} Tower</strong><br>
-                        <div style="font-size:12px; margin:5px 0;">හොඳම සිග්නල් මෙතැනට තිබේ.</div>
-                        <a href="https://wa.me/94765825288?text=I%20saw%20${net}%20tower%20on%20Router%20Home%20map" 
+                        <br><strong style="font-size:18px; color:#1a73e8;">${net} Signal</strong><br>
+                        <p style="font-size:14px; margin:8px 0; color:#555;">විශ්වාසදායක 4G/5G රවුටර් අපෙන් ලබාගන්න.</p>
+                        <a href="https://wa.me/94765825288?text=ROUTER%20HOME%20මැප්%20එකෙන්%20${net}%20ටවර්%20බලා%20රවුටරයක්%20ගැනීමට%20අවශ්‍යයි." 
                            target="_blank" class="buy-now-btn">මිලදී ගන්න</a>
                     </div>
                 `;
                 L.marker([tower.lat, tower.lng]).bindPopup(popupContent).addTo(markerGroup);
                 bounds.push([tower.lat, tower.lng]);
             });
-            if(bounds.length > 0) myMap.fitBounds(bounds, { padding: [50, 50] });
+            if(bounds.length > 0) myMap.fitBounds(bounds, { padding: [60, 60] });
         }
 
         function openAdmin() { if (prompt("Password:") === "20101027") document.getElementById('adminPanel').style.display = 'block'; }
         function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
+        
         function saveTower() {
             var net = document.getElementById('adminNetSelect').value;
             var lat = parseFloat(document.getElementById('towerLat').value);
@@ -143,7 +148,7 @@
             if (!isNaN(lat) && !isNaN(lng)) {
                 localData[net].push({ lat: lat, lng: lng });
                 localStorage.setItem('myTowers', JSON.stringify(localData));
-                alert("Tower එකතු වුණා!");
+                alert("Tower එක සාර්ථකව එකතු වුණා!");
                 updateDisplay();
                 closeAdmin();
             }
@@ -152,7 +157,7 @@
         function findMyLocation() {
             myMap.locate({setView: true, maxZoom: 14});
             myMap.on('locationfound', function(e) {
-                L.circleMarker(e.latlng, {radius: 8, color: '#1a73e8', fillColor: '#1a73e8', fillOpacity: 0.8}).addTo(myMap).bindPopup("ඔබ සිටින ස්ථානය").openPopup();
+                L.circleMarker(e.latlng, {radius: 10, color: '#1a73e8', fillColor: '#1a73e8', fillOpacity: 0.6}).addTo(myMap).bindPopup("ඔබ සිටින ස්ථානය").openPopup();
             });
         }
     </script>
