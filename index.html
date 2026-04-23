@@ -1,113 +1,83 @@
 
-
 <!DOCTYPE html>
 <html lang="si">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>ROUTER HOME - Dialog 5G Map</title>
+    <title>ROUTER HOME</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
         #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
         
-        /* Header styling */
-        .top-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 92%; max-width: 450px; }
-        
-        .biz-header { 
-            background: #1a73e8; 
-            color: white; 
-            padding: 12px; 
-            border-radius: 15px 15px 0 0; 
-            font-size: 20px; 
-            font-weight: 800; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
+        .top-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 92%; max-width: 400px; }
+        .biz-header { background: #1a73e8; color: white; padding: 12px; border-radius: 15px 15px 0 0; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .biz-logo { height: 40px; width: 40px; border-radius: 5px; border: 2px solid white; }
+        .select-box { width: 100%; padding: 15px; border-radius: 0 0 15px 15px; border: 4px solid #1a73e8; font-size: 17px; font-weight: bold; cursor: pointer; }
 
-        .biz-logo { 
-            height: 45px; 
-            width: 45px; 
-            border-radius: 8px; 
-            border: 2px solid white; 
-            background: white;
-        }
+        /* Social Buttons */
+        .social-container { position: fixed; bottom: 25px; right: 15px; z-index: 2000; display: flex; flex-direction: column; gap: 12px; }
+        .social-btn { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .whatsapp { background: #25D366; }
+        .facebook { background: #1877F2; }
+        .social-btn img { width: 32px; height: 32px; }
 
-        .select-box { 
-            width: 100%; 
-            padding: 15px; 
-            border-radius: 0 0 15px 15px; 
-            border: 4px solid #1a73e8; 
-            font-size: 17px; 
-            background: white; 
-            font-weight: bold; 
-            cursor: pointer; 
-            color: #333;
-        }
-
-        .buy-now-btn { 
-            background: #25D366; 
-            color: white !important; 
-            padding: 10px; 
-            text-decoration: none; 
-            display: block; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            margin-top: 8px; 
-            text-align: center; 
-        }
+        .buy-now-btn { background: #25D366; color: white !important; padding: 12px; text-decoration: none; display: block; border-radius: 8px; font-weight: bold; margin-top: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="top-container">
         <div class="biz-header">
-            <img src="https://i.ibb.co/cXrHqXsF/logo.png" class="biz-logo" alt="Logo">
+            <img src="https://i.ibb.co/cXrHqXsF/logo.png" class="biz-logo">
             ROUTER HOME
         </div>
-        <select id="networkSelect" class="select-box" onchange="showTower()">
+        <select id="networkSelect" class="select-box" onchange="updateDisplay()">
             <option value="">ජාලය තෝරන්න (Select Network)</option>
             <option value="Dialog">Dialog 5G</option>
+            <option value="Mobitel">Mobitel 4G</option>
+            <option value="Hutch">Hutch 4G</option>
         </select>
+    </div>
+
+    <div class="social-container">
+        <a href="https://wa.me/94765825288" target="_blank" class="social-btn whatsapp"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"></a>
+        <a href="https://www.facebook.com/profile.php?id=61571477700207" target="_blank" class="social-btn facebook"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg"></a>
     </div>
 
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // 5G සඳහා රතු පාට මාකර් එක
-        var redIcon = new L.Icon({ 
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', 
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', 
-            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] 
-        });
+        // Icons
+        var redIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
+        var blueIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
 
-        // සිතියම load වන විට ඔබ ලබාදුන් ස්ථානයට (Center) සැකසීම
-        var myMap = L.map('map', { zoomControl: false }).setView([6.706035, 79.909137], 15);
+        var myMap = L.map('map', { zoomControl: false }).setView([6.706035, 79.909137], 14);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
-        // Dialog 5G ටවර් එකේ දත්ත පමණි
-        var tower = { lat: 6.706035, lng: 79.909137, type: "5G" };
+        var towers = {
+            "Dialog": { lat: 6.706035, lng: 79.909137, type: "5G", icon: redIcon },
+            "Mobitel": { lat: 6.709786, lng: 79.922136, type: "4G", icon: blueIcon },
+            "Hutch": { lat: 6.700144, lng: 79.912565, type: "4G", icon: blueIcon }
+        };
 
-        function showTower() {
+        function updateDisplay() {
             var val = document.getElementById('networkSelect').value;
             markerGroup.clearLayers(); 
 
-            if (val === "Dialog") {
-                var waMsg = encodeURIComponent("මට Dialog 5G Router එකක් මිලදී ගැනීමට අවශ්‍යයි.");
-                var popupHTML = `
-                    <div style="text-align:center;">
-                        <b>Dialog 5G</b><br>
-                        <a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">Router මිලදී ගන්න</a>
-                    </div>`;
+            if (val && towers[val]) {
+                var t = towers[val];
+                var waMsg = encodeURIComponent("මට " + val + " Router එකක් අවශ්‍යයි.");
+                var popup = `<div style="text-align:center;"><b>${val} ${t.type}</b><br><a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">මිලදී ගන්න</a></div>`;
                 
-                var m = L.marker([tower.lat, tower.lng], {icon: redIcon}).addTo(markerGroup);
-                m.bindPopup(popupHTML).openPopup();
-                myMap.flyTo([tower.lat, tower.lng], 17);
+                // මෙතැන .openPopup() ඉවත් කර ඇත. එවිට ටවර් එක ක්ලික් කළ විට පමණක් Popup එක පෙනේ.
+                L.marker([t.lat, t.lng], {icon: t.icon}).addTo(markerGroup).bindPopup(popup);
+                
+                myMap.flyTo([t.lat, t.lng], 17);
             }
         }
     </script>
+</body>
+</html>
