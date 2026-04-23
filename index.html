@@ -18,20 +18,17 @@
         .blue-dot { background-color: #1a73e8; }
         .select-box { width: 100%; padding: 12px; border-radius: 0 0 12px 12px; border: 3px solid #1a73e8; font-size: 16px; background: white; font-weight: bold; }
 
-        /* Social Buttons */
-        .social-buttons { position: fixed; bottom: 80px; right: 20px; z-index: 1500; display: flex; flex-direction: column; gap: 15px; }
+        .social-buttons { position: fixed; bottom: 80px; right: 20px; z-index: 1500; display: flex; flex-direction: column; gap: 12px; }
         .social-btn { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); transition: 0.3s; }
         .whatsapp-btn { background-color: #25D366; }
         .facebook-btn { background-color: #1877F2; }
-        .social-btn img { width: 32px; height: 32px; }
-        .social-btn:hover { transform: scale(1.1); }
+        .social-btn img { width: 30px; height: 30px; }
 
-        .popup-card { text-align: center; width: 180px; }
-        .buy-now-btn { background: #25D366; color: white !important; padding: 8px; text-decoration: none; display: block; border-radius: 5px; font-weight: bold; margin-top: 8px; }
-        
-        .secret-admin { position: fixed; bottom: 20px; right: 30px; z-index: 1500; background: #333; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; opacity: 0.3; }
+        .secret-admin { position: fixed; bottom: 20px; right: 30px; z-index: 1500; background: #333; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; opacity: 0.2; }
         #adminPanel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; background: white; padding: 20px; border-radius: 15px; width: 85%; max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .admin-input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
+        
+        .buy-now-btn { background: #25D366; color: white !important; padding: 8px; text-decoration: none; display: block; border-radius: 5px; font-weight: bold; margin-top: 8px; text-align: center; }
     </style>
 </head>
 <body>
@@ -42,14 +39,14 @@
             ROUTER HOME
         </div>
         <div class="tower-legend">
-            <div><span class="dot red-dot"></span> 5G</div>
-            <div><span class="dot blue-dot"></span> 4G</div>
+            <div><span class="dot red-dot"></span> 5G Tower</div>
+            <div><span class="dot blue-dot"></span> 4G Tower</div>
         </div>
         <select id="networkSelect" class="select-box" onchange="updateDisplay()">
-            <option value="">ජාලය තෝරන්න</option>
-            <option value="Dialog">Dialog 4G/5G</option>
-            <option value="Mobitel">Mobitel 4G/5G</option>
-            <option value="Hutch">Hutch 4G/5G</option>
+            <option value="">ජාලය තෝරන්න (Select Network)</option>
+            <option value="Dialog">Dialog</option>
+            <option value="Mobitel">Mobitel</option>
+            <option value="Hutch">Hutch</option>
         </select>
     </div>
 
@@ -57,10 +54,10 @@
 
     <div class="social-buttons">
         <a href="https://wa.me/94765825288" target="_blank" class="social-btn whatsapp-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA">
         </a>
-        <a href="https://www.facebook.com/YOUR_PAGE" target="_blank" class="social-btn facebook-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook">
+        <a href="https://www.facebook.com/profile.php?id=61571477700207" target="_blank" class="social-btn facebook-btn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="FB">
         </a>
     </div>
 
@@ -78,7 +75,8 @@
         <input type="number" id="towerLat" class="admin-input" step="any" placeholder="Latitude">
         <input type="number" id="towerLng" class="admin-input" step="any" placeholder="Longitude">
         <button style="width:100%; padding:10px; background:#1a73e8; color:white; border:none; border-radius:5px;" onclick="saveTower()">සේව් කරන්න</button>
-        <button onclick="closeAdmin()" style="width:100%; border:none; background:none; margin-top:10px;">වහන්න</button>
+        <button onclick="closeAdmin()" style="width:100%; border:none; background:none; margin-top:10px; color:gray;">වහන්න</button>
+        <button onclick="clearAllData()" style="width:100%; border:none; background:red; color:white; padding:10px; margin-top:10px; border-radius:5px;">සියල්ල මකන්න (Clear All)</button>
     </div>
 
     <button class="secret-admin" onclick="openAdmin()">⚙️</button>
@@ -88,14 +86,15 @@
         var redIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
         var blueIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
 
+        // සියලුම ස්ථිර ටවර්ස් ඉවත් කර ඇත
         var publicTowers = { 
-            "Dialog": [{ lat: 6.665151, lng: 79.939237, type: "5G" }, { lat: 6.661753, lng: 79.971831, type: "5G" }, { lat: 6.666295, lng: 79.940239, type: "5G" }],
-            "Mobitel": [{ lat: 6.665369, lng: 79.929752, type: "5G" }, { lat: 6.666295, lng: 79.940239, type: "4G" }],
-            "Hutch": [{ lat: 6.665151, lng: 79.939237, type: "4G" }, { lat: 6.666295, lng: 79.940239, type: "4G" }] 
+            "Dialog": [],
+            "Mobitel": [],
+            "Hutch": [] 
         };
 
         var localData = JSON.parse(localStorage.getItem('myTowers')) || { "Hutch": [], "Mobitel": [], "Dialog": [] };
-        var myMap = L.map('map', { zoomControl: false }).setView([6.666295, 79.940239], 14);
+        var myMap = L.map('map', { zoomControl: false }).setView([7.8731, 80.7718], 7); // මුළු ලංකාවම පෙනෙන පරිදි සකසා ඇත
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
@@ -107,15 +106,32 @@
             allForNet.forEach(function(tower) {
                 var towerIcon = tower.type === "5G" ? redIcon : blueIcon;
                 var waMsg = encodeURIComponent("මට " + net + " " + tower.type + " Router එකක් මිලදී ගැනීමට අවශ්‍යයි.");
-                var popupContent = `<div class="popup-card"><strong>${net} ${tower.type}</strong><br><a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">මිලදී ගන්න</a></div>`;
+                var popupContent = `<div style="text-align:center;"><strong>${net} ${tower.type}</strong><br><a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">මිලදී ගන්න</a></div>`;
                 L.marker([tower.lat, tower.lng], {icon: towerIcon}).bindPopup(popupContent).addTo(markerGroup);
             });
         }
+
         function openAdmin() { if (prompt("Password:") === "20101027") document.getElementById('adminPanel').style.display = 'block'; }
         function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
+        
         function saveTower() {
             var net = document.getElementById('adminNetSelect').value, type = document.getElementById('towerType').value, lat = parseFloat(document.getElementById('towerLat').value), lng = parseFloat(document.getElementById('towerLng').value);
-            if (!isNaN(lat)) { localData[net].push({ lat: lat, lng: lng, type: type }); localStorage.setItem('myTowers', JSON.stringify(localData)); updateDisplay(); closeAdmin(); }
+            if (!isNaN(lat) && !isNaN(lng)) {
+                localData[net].push({ lat: lat, lng: lng, type: type });
+                localStorage.setItem('myTowers', JSON.stringify(localData));
+                updateDisplay();
+                closeAdmin();
+            }
+        }
+
+        // Admin Panel එක හරහා ඔබම එකතු කළ දත්ත මැකීමට
+        function clearAllData() {
+            if(confirm("ඔබ එකතු කළ සියලුම ටවර් දත්ත මකා දැමීමට අවශ්‍යද?")) {
+                localStorage.removeItem('myTowers');
+                localData = { "Hutch": [], "Mobitel": [], "Dialog": [] };
+                updateDisplay();
+                alert("සියලු දත්ත මැකී ගියා.");
+            }
         }
     </script>
 </body>
