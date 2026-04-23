@@ -58,9 +58,12 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
-        // යාවත්කාලීන කරන ලද සියලුම ටවර් දත්ත
+        // සියලුම ටවර් දත්ත ලැයිස්තුව
         var allTowers = [
-            { lat: 6.740611, lng: 79.895056, net: "Dialog", type: "5G", icon: redIcon }, // අලුත් ස්ථානය
+            { lat: 6.758548, lng: 79.891150, net: "Dialog", type: "5G", icon: redIcon }, // අලුත් Dialog 5G
+            { lat: 6.726937, lng: 79.900840, net: "Dialog", type: "5G", icon: redIcon },
+            { lat: 6.726937, lng: 79.900840, net: "Hutch", type: "4G", icon: blueIcon },
+            { lat: 6.740611, lng: 79.895056, net: "Dialog", type: "5G", icon: redIcon },
             { lat: 6.666275, lng: 79.940145, net: "Dialog", type: "5G", icon: redIcon },
             { lat: 6.729139, lng: 79.909528, net: "Dialog", type: "5G", icon: redIcon },
             { lat: 6.726833, lng: 79.900861, net: "Hutch", type: "4G", icon: blueIcon },
@@ -76,7 +79,7 @@
                 var bounds = [];
                 allTowers.forEach(function(t) {
                     if (t.net === selectedNet) {
-                        var waMsg = encodeURIComponent("මට " + t.net + " " + t.type + " Router එකක් අවශ්‍යයි.");
+                        var waMsg = encodeURIComponent("මට " + t.net + " " + t.type + " Router එකක් මිලදී ගැනීමට අවශ්‍යයි.");
                         var popupHTML = `<div style="text-align:center;"><b>${t.net} ${t.type}</b><br><a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">මිලදී ගන්න</a></div>`;
                         
                         L.marker([t.lat, t.lng], {icon: t.icon}).addTo(markerGroup).bindPopup(popupHTML);
