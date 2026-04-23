@@ -3,31 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>ROUTER HOME - Location Update</title>
+    <title>ROUTER HOME - All Towers Update</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
         #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
-        
         .top-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 92%; max-width: 400px; }
         .biz-header { background: #1a73e8; color: white; padding: 12px; border-radius: 15px 15px 0 0; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .biz-logo { height: 40px; width: 40px; border-radius: 5px; border: 2px solid white; background: white; }
         .select-box { width: 100%; padding: 15px; border-radius: 0 0 15px 15px; border: 4px solid #1a73e8; font-size: 17px; font-weight: bold; cursor: pointer; color: #333; }
-
-        .map-legend {
-            position: absolute; bottom: 30px; left: 15px; background: white; padding: 10px; 
-            border-radius: 8px; z-index: 1000; font-size: 14px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            border: 1px solid #ccc;
-        }
+        .map-legend { position: absolute; bottom: 30px; left: 15px; background: white; padding: 10px; border-radius: 8px; z-index: 1000; font-size: 14px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: 1px solid #ccc; }
         .dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; }
-
         .social-container { position: fixed; bottom: 25px; right: 15px; z-index: 2000; display: flex; flex-direction: column; gap: 12px; }
         .social-btn { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .whatsapp { background: #25D366; }
         .facebook { background: #1877F2; }
         .social-btn img { width: 32px; height: 32px; }
-
-        .buy-now-btn { background: #25D366; color: white !important; padding: 12px; text-decoration: none; display: block; border-radius: 8px; font-weight: bold; margin-top: 10px; text-align: center; }
+        .buy-now-btn { background: #25D366; color: white !important; padding: 10px; text-decoration: none; display: block; border-radius: 8px; font-weight: bold; margin-top: 8px; text-align: center; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -39,9 +31,9 @@
         </div>
         <select id="networkSelect" class="select-box" onchange="updateDisplay()">
             <option value="">ජාලය තෝරන්න</option>
-            <option value="Dialog">Dialog</option>
-            <option value="Mobitel">Mobitel</option>
-            <option value="Hutch">Hutch</option>
+            <option value="Dialog">Dialog (5G)</option>
+            <option value="Mobitel">Mobitel (4G)</option>
+            <option value="Hutch">Hutch (4G)</option>
         </select>
     </div>
 
@@ -62,30 +54,39 @@
         var redIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
         var blueIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
 
-        // නව ඛණ්ඩාංක: 6°43'44.9"N 79°54'34.3"E
-        var towerLoc = [6.729139, 79.909528];
-        var myMap = L.map('map', { zoomControl: false }).setView(towerLoc, 15);
+        var myMap = L.map('map', { zoomControl: false }).setView([6.700, 79.920], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
+        // යාවත්කාලීන කරන ලද සියලුම ටවර් දත්ත
+        var allTowers = [
+            { lat: 6.740611, lng: 79.895056, net: "Dialog", type: "5G", icon: redIcon }, // අලුත් ස්ථානය
+            { lat: 6.666275, lng: 79.940145, net: "Dialog", type: "5G", icon: redIcon },
+            { lat: 6.729139, lng: 79.909528, net: "Dialog", type: "5G", icon: redIcon },
+            { lat: 6.726833, lng: 79.900861, net: "Hutch", type: "4G", icon: blueIcon },
+            { lat: 6.729139, lng: 79.909528, net: "Mobitel", type: "4G", icon: blueIcon },
+            { lat: 6.729139, lng: 79.909528, net: "Hutch", type: "4G", icon: blueIcon }
+        ];
+
         function updateDisplay() {
-            var val = document.getElementById('networkSelect').value;
+            var selectedNet = document.getElementById('networkSelect').value;
             markerGroup.clearLayers(); 
 
-            if (val) {
-                var isDialog = (val === "Dialog");
-                var type = isDialog ? "5G" : "4G";
-                var icon = isDialog ? redIcon : blueIcon;
-                var waMsg = encodeURIComponent("මට " + val + " " + type + " Router එකක් අවශ්‍යයි.");
-                
-                var popupHTML = `
-                    <div style="text-align:center;">
-                        <b>${val} ${type}</b><br>
-                        <a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">මිලදී ගන්න</a>
-                    </div>`;
-                
-                L.marker(towerLoc, {icon: icon}).addTo(markerGroup).bindPopup(popupHTML);
-                myMap.flyTo(towerLoc, 17);
+            if (selectedNet) {
+                var bounds = [];
+                allTowers.forEach(function(t) {
+                    if (t.net === selectedNet) {
+                        var waMsg = encodeURIComponent("මට " + t.net + " " + t.type + " Router එකක් අවශ්‍යයි.");
+                        var popupHTML = `<div style="text-align:center;"><b>${t.net} ${t.type}</b><br><a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">මිලදී ගන්න</a></div>`;
+                        
+                        L.marker([t.lat, t.lng], {icon: t.icon}).addTo(markerGroup).bindPopup(popupHTML);
+                        bounds.push([t.lat, t.lng]);
+                    }
+                });
+
+                if (bounds.length > 0) {
+                    myMap.fitBounds(bounds, {padding: [50, 50]});
+                }
             }
         }
     </script>
