@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="si">
 <head>
@@ -32,15 +31,15 @@
         </div>
         <select id="networkSelect" class="select-box" onchange="updateDisplay()">
             <option value="">ජාලය තෝරන්න</option>
-            <option value="Dialog and airtel">Dialog (4g,5G)</option>
-            <option value="Mobitel">Mobitel (5g,4G)</option>
+            <option value="Dialog">Dialog (5G)</option>
+            <option value="Mobitel">Mobitel (4G)</option>
             <option value="Hutch">Hutch (4G)</option>
         </select>
     </div>
 
     <div class="map-legend">
-        <div><span class="dot" style="background:red;"></span> 5G Tower </div>
-        <div style="margin-top:5px;"><span class="dot" style="background:blue;"></span> 4G Tower </div>
+        <div><span class="dot" style="background:red;"></span> 5G Tower (රතු)</div>
+        <div style="margin-top:5px;"><span class="dot" style="background:blue;"></span> 4G Tower (නිල්)</div>
     </div>
 
     <div class="social-container">
@@ -55,13 +54,18 @@
         var redIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
         var blueIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
 
-        var myMap = L.map('map', { zoomControl: false }).setView([6.730, 79.910], 12);
+        var myMap = L.map('map', { zoomControl: false }).setView([6.735, 79.950], 11);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
         var markerGroup = L.layerGroup().addTo(myMap);
 
-        // සියලුම ටවර් දත්ත ලැයිස්තුව
+        // සියලුම යාවත්කාලීන ටවර් දත්ත ලැයිස්තුව
         var allTowers = [
-            { lat: 6.788097, lng: 79.898579, net: "Dialog", type: "5G", icon: redIcon }, // නව Dialog 5G
+            { lat: 6.749831, lng: 79.969831, net: "Dialog", type: "5G", icon: redIcon }, // නව ස්ථානය
+            { lat: 6.740398, lng: 79.940498, net: "Dialog", type: "5G", icon: redIcon },
+            { lat: 6.713426, lng: 79.987046, net: "Dialog", type: "5G", icon: redIcon },
+            { lat: 6.704626, lng: 79.960664, net: "Dialog", type: "5G", icon: redIcon }, 
+            { lat: 6.662883, lng: 79.971915, net: "Dialog", type: "5G", icon: redIcon },
+            { lat: 6.788097, lng: 79.898579, net: "Dialog", type: "5G", icon: redIcon },
             { lat: 6.784110, lng: 79.890967, net: "Dialog", type: "5G", icon: redIcon },
             { lat: 6.782772, lng: 79.896315, net: "Dialog", type: "5G", icon: redIcon },
             { lat: 6.780315, lng: 79.883471, net: "Dialog", type: "5G", icon: redIcon },
@@ -85,7 +89,7 @@
                 allTowers.forEach(function(t) {
                     if (t.net === selectedNet) {
                         var waMsg = encodeURIComponent("මට " + t.net + " " + t.type + " Router එකක් මිලදී ගැනීමට අවශ්‍යයි.");
-                        var popupHTML = `<div style="text-align:center;"><b>${t.net} ${t.type}</b><br><a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">Router මිලදී ගන්න</a></div>`;
+                        var popupHTML = `<div style="text-align:center;"><b>${t.net} ${t.type}</b><br><a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">මිලදී ගන්න</a></div>`;
                         
                         L.marker([t.lat, t.lng], {icon: t.icon}).addTo(markerGroup).bindPopup(popupHTML);
                         bounds.push([t.lat, t.lng]);
