@@ -1,106 +1,119 @@
 <!DOCTYPE html>
 <html lang="si">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>ROUTER HOME - All Towers Update</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', sans-serif; }
-        #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
-        .top-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 92%; max-width: 400px; }
-        .biz-header { background: #1a73e8; color: white; padding: 12px; border-radius: 15px 15px 0 0; font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .biz-logo { height: 40px; width: 40px; border-radius: 5px; border: 2px solid white; background: white; }
-        .select-box { width: 100%; padding: 15px; border-radius: 0 0 15px 15px; border: 4px solid #1a73e8; font-size: 17px; font-weight: bold; cursor: pointer; color: #333; }
-        .map-legend { position: absolute; bottom: 30px; left: 15px; background: white; padding: 10px; border-radius: 8px; z-index: 1000; font-size: 14px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); border: 1px solid #ccc; }
-        .dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; }
-        .social-container { position: fixed; bottom: 25px; right: 15px; z-index: 2000; display: flex; flex-direction: column; gap: 12px; }
-        .social-btn { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .whatsapp { background: #25D366; }
-        .facebook { background: #1877F2; }
-        .social-btn img { width: 32px; height: 32px; }
-        .buy-now-btn { background: #25D366; color: white !important; padding: 10px; text-decoration: none; display: block; border-radius: 8px; font-weight: bold; margin-top: 8px; text-align: center; font-size: 14px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BGVPNZONE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#071426;color:white}
+header{text-align:center;padding:25px 10px;background:#102747}
+header h1{color:#38bdf8;font-size:32px}
+header p{color:#cbd5e1;margin-top:8px}
+.hero{text-align:center;padding:45px 15px;background:linear-gradient(135deg,#102e55,#071426)}
+.hero h2{font-size:30px;margin-bottom:12px}
+.hero h2 span{color:#38bdf8}
+.hero p{color:#cbd5e1;line-height:1.8}
+.badge{display:inline-block;background:#123c5e;color:#7dd3fc;padding:9px 15px;border-radius:25px;margin-bottom:20px}
+.container{max-width:1000px;margin:auto;padding:30px 15px}
+.container h2{text-align:center;margin-bottom:25px}
+.packages{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:#10213a;border:1px solid #23466d;border-radius:14px;padding:23px 15px;text-align:center}
+.card .icon{font-size:35px;margin-bottom:12px}
+.card h3{font-size:19px;margin-bottom:10px}
+.card p{color:#a8bdd3;margin-bottom:18px;font-size:14px}
+.btn{display:inline-block;text-decoration:none;background:#16a34a;color:white;padding:12px 18px;border-radius:8px;font-weight:bold}
+.card .btn{display:block}
+.v2ray{text-align:center;background:#102747;padding:25px 15px;border-radius:14px;margin-top:25px;border:1px solid #2563eb}
+.v2ray h2{color:#38bdf8;margin-bottom:10px}
+.v2ray p{margin-bottom:18px;color:#cbd5e1}
+.contact{text-align:center;padding:35px 15px;background:#0d1e33}
+.contact p{margin:12px 0 20px;color:#cbd5e1}
+footer{text-align:center;padding:18px;color:#8ca3bd;font-size:13px}
+</style>
 </head>
 <body>
 
-    <div class="top-container">
-        <div class="biz-header">
-            <img src="https://i.ibb.co/cXrHqXsF/logo.png" class="biz-logo">
-            ROUTER HOME
-        </div>
-        <select id="networkSelect" class="select-box" onchange="updateDisplay()">
-            <option value="">ජාලය තෝරන්න</option>
-            <option value="Dialog">Dialog (5G)</option>
-            <option value="Mobitel">Mobitel (4G)</option>
-            <option value="Hutch">Hutch (4G)</option>
-        </select>
-    </div>
+<header>
+<h1>BGVPNZONE</h1>
+<p>Your Internet Package Center 🇱🇰</p>
+</header>
 
-    <div class="map-legend">
-        <div><span class="dot" style="background:red;"></span> 5G Tower (රතු)</div>
-        <div style="margin-top:5px;"><span class="dot" style="background:blue;"></span> 4G Tower (නිල්)</div>
-    </div>
+<section class="hero">
+<div class="badge">⚡ V2Ray Files Available</div>
+<h2>Welcome to <span>BGVPNZONE</span></h2>
+<p>
+ඔබට අවශ්‍ය Internet Packages සහ V2Ray Files ලබාගන්න.<br>
+Contact us for more details!
+</p>
+</section>
 
-    <div class="social-container">
-        <a href="https://wa.me/94765825288" target="_blank" class="social-btn whatsapp"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"></a>
-        <a href="https://www.facebook.com/profile.php?id=61571477700207" target="_blank" class="social-btn facebook"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg"></a>
-    </div>
+<section class="container">
+<h2>📦 Our Packages</h2>
 
-    <div id="map"></div>
+<div class="packages">
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        var redIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
-        var blueIcon = new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] });
+<div class="card">
+<div class="icon">📡</div>
+<h3>Dialog Zoom Router</h3>
+<p>Package Details සඳහා විමසන්න</p>
+<a class="btn" href="https://wa.me/94754260675?text=Dialog%20Zoom%20Router%20details">Inquire Now</a>
+</div>
 
-        var myMap = L.map('map', { zoomControl: false }).setView([6.735, 79.950], 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(myMap);
-        var markerGroup = L.layerGroup().addTo(myMap);
+<div class="card">
+<div class="icon">📱</div>
+<h3>Airtel 260</h3>
+<p>Package Details සඳහා විමසන්න</p>
+<a class="btn" href="https://wa.me/94754260675?text=Airtel%20260%20details">Inquire Now</a>
+</div>
 
-        // සියලුම යාවත්කාලීන ටවර් දත්ත ලැයිස්තුව
-        var allTowers = [
-            { lat: 6.749831, lng: 79.969831, net: "Dialog", type: "5G", icon: redIcon }, // නව ස්ථානය
-            { lat: 6.740398, lng: 79.940498, net: "Dialog", type: "5G", icon: redIcon },
-            { lat: 6.713426, lng: 79.987046, net: "Dialog", type: "5G", icon: redIcon },
-            { lat: 6.704626, lng: 79.960664, net: "Dialog", type: "5G", icon: redIcon }, 
-            { lat: 6.662883, lng: 79.971915, net: "Dialog", type: "5G", icon: redIcon },
-            { lat: 6.788097, lng: 79.898579, net: "Dialog", type: "5G", icon: redIcon },
-            { lat: 6.784110, lng: 79.890967, net: "Dialog", type: "5G", icon: redIcon },
-            { lat: 6.782772, lng: 79.896315, net: "Dialog", type: "5G", icon: redIcon },
-            { lat: 6.780315, lng: 79.883471, net: "Dialog", type: "5G", icon: redIcon },
-            { lat: 6.758548, lng: 79.891150, net: "Dialog", type: "5G", icon: redIcon },
-            { lat: 6.726937, lng: 79.900840, net: "Dialog", type: "5G", icon: redIcon },
-            { lat: 6.726937, lng: 79.900840, net: "Hutch", type: "4G", icon: blueIcon },
-            { lat: 6.740611, lng: 79.895056, net: "Dialog", type: "5G", icon: redIcon },
-            { lat: 6.666275, lng: 79.940145, net: "Dialog", type: "5G", icon: redIcon },
-            { lat: 6.729139, lng: 79.909528, net: "Dialog", type: "5G", icon: redIcon },
-            { lat: 6.726833, lng: 79.900861, net: "Hutch", type: "4G", icon: blueIcon },
-            { lat: 6.729139, lng: 79.909528, net: "Mobitel", type: "4G", icon: blueIcon },
-            { lat: 6.729139, lng: 79.909528, net: "Hutch", type: "4G", icon: blueIcon }
-        ];
+<div class="card">
+<div class="icon">🚀</div>
+<h3>Airtel 997</h3>
+<p>Package Details සඳහා විමසන්න</p>
+<a class="btn" href="https://wa.me/94754260675?text=Airtel%20997%20details">Inquire Now</a>
+</div>
 
-        function updateDisplay() {
-            var selectedNet = document.getElementById('networkSelect').value;
-            markerGroup.clearLayers(); 
+<div class="card">
+<div class="icon">📶</div>
+<h3>Hutch 224</h3>
+<p>Package Details සඳහා විමසන්න</p>
+<a class="btn" href="https://wa.me/94754260675?text=Hutch%20224%20details">Inquire Now</a>
+</div>
 
-            if (selectedNet) {
-                var bounds = [];
-                allTowers.forEach(function(t) {
-                    if (t.net === selectedNet) {
-                        var waMsg = encodeURIComponent("මට " + t.net + " " + t.type + " Router එකක් මිලදී ගැනීමට අවශ්‍යයි.");
-                        var popupHTML = `<div style="text-align:center;"><b>${t.net} ${t.type}</b><br><a href="https://wa.me/94765825288?text=${waMsg}" target="_blank" class="buy-now-btn">මිලදී ගන්න</a></div>`;
-                        
-                        L.marker([t.lat, t.lng], {icon: t.icon}).addTo(markerGroup).bindPopup(popupHTML);
-                        bounds.push([t.lat, t.lng]);
-                    }
-                });
+<div class="card">
+<div class="icon">🌐</div>
+<h3>Dialog Mobile Zoom</h3>
+<p>Package Details සඳහා විමසන්න</p>
+<a class="btn" href="https://wa.me/94754260675?text=Dialog%20Mobile%20Zoom%20details">Inquire Now</a>
+</div>
 
-                if (bounds.length > 0) {
-                    myMap.fitBounds(bounds, {padding: [50, 50]});
-                }
-            }
-        }
-    </script>
+<div class="card">
+<div class="icon">📲</div>
+<h3>Mobitel Zoom</h3>
+<p>Package Details සඳහා විමසන්න</p>
+<a class="btn" href="https://wa.me/94754260675?text=Mobitel%20Zoom%20details">Inquire Now</a>
+</div>
+
+</div>
+
+<div class="v2ray">
+<h2>🔐 V2Ray Files Available</h2>
+<p>V2Ray Files පිළිබඳ වැඩි විස්තර දැනගන්න.</p>
+<a class="btn" href="https://wa.me/94754260675?text=V2Ray%20Files%20details">Contact on WhatsApp</a>
+</div>
+</section>
+
+<section class="contact">
+<h2>📞 Contact Us</h2>
+<p>වැඩි විස්තර සඳහා WhatsApp හරහා සම්බන්ධ වන්න.</p>
+<a class="btn" href="https://wa.me/94754260675" target="_blank" rel="noopener noreferrer">WhatsApp: 0754260675</a>
+</section>
+
+<footer>
+<p>© 2026 BGVPNZONE | All Rights Reserved</p>
+<p>Thank you for visiting our website 💙</p>
+</footer>
+
 </body>
 </html>
